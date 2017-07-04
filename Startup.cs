@@ -41,6 +41,7 @@ namespace OneTestApi
 
             services.AddTransient<ITestProjectService, TestProjectService>();
             services.AddTransient<ITestSuiteService, TestSuiteService>();
+            services.AddTransient<ITestCaseService, TestCaseService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

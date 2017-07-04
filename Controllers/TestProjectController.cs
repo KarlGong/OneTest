@@ -38,6 +38,13 @@ namespace OneTestApi.Controllers
             return _service.AddTestProject(ps);
         }
 
+        [HttpPost("{id}")]
+        public void UpdateTestProject(int id, [FromBody] UpdateTestProjectParams ps)
+        {
+            ps.Id = id;
+            _service.UpdateTestProject(ps);
+        }
+
         [HttpGet("{id}/rootsuite")]
         public TestSuite GetRootTestSuite(int id)
         {

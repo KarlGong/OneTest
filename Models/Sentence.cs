@@ -5,7 +5,7 @@ namespace OneTestApi.Models
 {
     public class Sentence
     {
-        public int SentenceId { get; set; }
+        public int Id { get; set; }
         
         public string Value { get; set; }
         

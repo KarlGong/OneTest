@@ -11,6 +11,15 @@ namespace OneTestApi.Services
         public string Description { get; set; }
     }
 
+    public class UpdateTestProjectParams
+    {
+        public int Id { get; set; }
+        
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+    }
+
     public interface ITestProjectService
     {
         IEnumerable<TestProject> GetTestProjects();
@@ -20,6 +29,8 @@ namespace OneTestApi.Services
         TestSuite GetRootSuite(int projectId);
 
         int AddTestProject(AddTestProjectParams ps);
+
+        void UpdateTestProject(UpdateTestProjectParams ps);
     }
 
     public class TestProjectService : ITestProjectService
@@ -71,6 +82,16 @@ namespace OneTestApi.Services
             _context.SaveChanges();
 
             return testProject.Id;
+        }
+
+        public void UpdateTestProject(UpdateTestProjectParams ps)
+        {
+            var testProject = _context.TestProjects.Include(tp => tp.TestSuites).Single(tp => tp.Id == ps.Id);
+
+            testProject.Name = ps.Name;
+            testProject.Description = ps.Description;
+
+            _context.SaveChanges();
         }
     }
 }

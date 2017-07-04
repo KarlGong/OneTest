@@ -11,8 +11,6 @@ namespace OneTestApi.Models
         
         public bool IsVerification { get; set; }
         
-        public int Order { get; set; }
-        
         public TestCase TestCase { get; set; }
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
