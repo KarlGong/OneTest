@@ -9,7 +9,6 @@ using OneTestApi.Services;
 
 namespace OneTestApi.Controllers
 {
-
     [Route("api/project")]
     public class TestProjectController
     {
@@ -43,12 +42,6 @@ namespace OneTestApi.Controllers
         {
             ps.Id = id;
             _service.UpdateTestProject(ps);
-        }
-
-        [HttpGet("{id}/rootsuite")]
-        public TestSuite GetRootTestSuite(int id)
-        {
-            return _service.GetRootSuite(id);
         }
     }
 }

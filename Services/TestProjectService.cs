@@ -26,8 +26,6 @@ namespace OneTestApi.Services
 
         TestProject GetTestProject(int projectId);
 
-        TestSuite GetRootSuite(int projectId);
-
         int AddTestProject(AddTestProjectParams ps);
 
         void UpdateTestProject(UpdateTestProjectParams ps);
@@ -51,12 +49,6 @@ namespace OneTestApi.Services
         public TestProject GetTestProject(int projectId)
         {
             return _context.TestProjects.Single(tp => tp.Id == projectId);
-        }
-
-        public TestSuite GetRootSuite(int projectId)
-        {
-            return _context.TestProjects.Include(tp => tp.TestSuites)
-                .Single(tp => tp.Id == projectId).TestSuites.First();
         }
 
         public int AddTestProject(AddTestProjectParams ps)

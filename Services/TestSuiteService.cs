@@ -31,6 +31,8 @@ namespace OneTestApi.Services
 
         TestSuite GetTestSuiteDetail(int suiteId);
 
+        TestSuite GetRootTestSuite(int projectId);
+
         int AddTestSuite(AddTestSuiteParams ps);
 
         void UpdateTestSuite(UpdateTestSuiteParams ps);
@@ -54,6 +56,12 @@ namespace OneTestApi.Services
         {
             return _context.TestSuites.Include(ts => ts.TestSuites).Include(ts => ts.TestCases)
                 .Single(ts => ts.Id == suiteId);
+        }
+
+        public TestSuite GetRootTestSuite(int projectId)
+        {
+            return _context.TestProjects.Include(tp => tp.TestSuites)
+                .Single(tp => tp.Id == projectId).TestSuites.First();
         }
 
         public int AddTestSuite(AddTestSuiteParams ps)

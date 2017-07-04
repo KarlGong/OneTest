@@ -16,7 +16,7 @@ namespace OneTestApi.Services
 
         public string Precondition { get; set; }
 
-        public List<TestStep> TestSteps { get; set; }
+        public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
 
         public class TestStep
         {
@@ -36,7 +36,7 @@ namespace OneTestApi.Services
 
         public string Precondition { get; set; }
 
-        public List<TestStep> TestSteps { get; set; }
+        public List<TestStep> TestSteps { get; set; }  = new List<TestStep>();
 
         public class TestStep
         {
@@ -49,6 +49,8 @@ namespace OneTestApi.Services
     public interface ITestCaseService
     {
         TestCase GetTestCase(int testCaseId);
+
+        List<TestSuite> GetParentTestSuites(int testCaseId);
 
         int AddTestCase(AddTestCaseParams ps);
 
@@ -72,6 +74,22 @@ namespace OneTestApi.Services
             return testCase;
         }
 
+        public List<TestSuite> GetParentTestSuites(int testCaseId)
+        {
+            var parentSuites = new List<TestSuite>();
+            
+            var parentSuite = _context.TestCases.Include(tc => tc.TestSuite).Single(tc => tc.Id == testCaseId).TestSuite;
+
+            while (parentSuite != null)
+            {
+                parentSuites.Add(parentSuite);
+                parentSuite = _context.TestSuites.Include(ts => ts.ParentTestSuite)
+                    .Single(ts => ts.Id == parentSuite.Id).ParentTestSuite;
+            }
+            parentSuites.Reverse();
+            return parentSuites;
+        }
+
         public int AddTestCase(AddTestCaseParams ps)
         {
             var testSuite = _context.TestSuites.Single(ts => ts.Id == ps.TestSuiteId);
@@ -92,9 +110,12 @@ namespace OneTestApi.Services
             };
 
             testSuite.TestCases.Add(newTestCase);
-
-            testSuite.Count++;
-
+            
+            _context.SaveChanges();
+            
+            // update count
+            GetParentTestSuites(newTestCase.Id).ForEach(ts => ts.Count++);
+            
             _context.SaveChanges();
 
             return newTestCase.Id;

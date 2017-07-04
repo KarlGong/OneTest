@@ -7,11 +7,6 @@ namespace OneTestApi.Models
 {
     public class TestCase
     {
-        public TestCase()
-        {
-            this.TestSteps = new List<TestStep>();
-        }
-
         public int Id { get; set; }
         
         public string Name { get; set; }
@@ -24,7 +19,7 @@ namespace OneTestApi.Models
 
         public TestSuite TestSuite { get; set; }
         
-        public List<TestStep> TestSteps { get; set; }
+        public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime InsertTime { get; set; }

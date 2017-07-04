@@ -6,6 +6,21 @@ using OneTestApi.Services;
 
 namespace OneTestApi.Controllers
 {
+    public class TestNode
+    {
+        public string Type { get; set; }
+        
+        public int Id { get; set; }
+        
+        public string Name { get; set; }
+        
+        public int Order { get; set; }
+        
+        public int? Count { get; set; }
+        
+        public List<TestNode> Children { get; set; }= new List<TestNode>();
+    }
+
     [Route("api/suite")]
     public class TestSuiteController
     {
@@ -22,29 +37,44 @@ namespace OneTestApi.Controllers
             return _service.GetTestSuite(id);
         }
 
+        [HttpGet("root")]
+        public TestNode GetRootTestSuite([FromQuery] int projectId)
+        {
+            var testSuite = _service.GetRootTestSuite(projectId);
+            return new TestNode()
+            {
+                Type = "rootSuite",
+                Id = testSuite.Id,
+                Name = testSuite.Name,
+                Order = testSuite.Order,
+                Count = testSuite.Count
+            };
+        }
+
         [HttpGet("{id}/children")]
-        public IEnumerable<object> GetChildren(int id)
+        public IEnumerable<TestNode> GetChildren(int id)
         {
             var testSuite = _service.GetTestSuiteDetail(id);
-            return testSuite.TestCases.Select(tc => new
+            return testSuite.TestCases.Select(tc => new TestNode()
             {
-                Type = "TestCase",
-                tc.Id,
-                tc.Name,
-                tc.Order
-            }).Union(testSuite.TestSuites.Select(ts => new
+                Type = "case",
+                Id = tc.Id,
+                Name = tc.Name,
+                Order = tc.Order,
+                Count = null
+            }).Union(testSuite.TestSuites.Select(ts => new TestNode()
             {
-                Type = "TestSuite",
-                ts.Id,
-                ts.Name,
-                ts.Order
+                Type = "suite",
+                Id = ts.Id,
+                Name = ts.Name,
+                Order = ts.Order,
+                Count = ts.Count
             })).OrderBy(tn => tn.Order);
         }
 
-        [HttpPut("{id}")]
-        public int AddTestSuite(int id, [FromBody] AddTestSuiteParams ps)
+        [HttpPut]
+        public int AddTestSuite([FromBody] AddTestSuiteParams ps)
         {
-            ps.ParentSuiteId = id;
             return _service.AddTestSuite(ps);
         }
 

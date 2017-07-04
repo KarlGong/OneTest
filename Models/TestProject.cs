@@ -7,18 +7,13 @@ namespace OneTestApi.Models
 {
     public class TestProject
     {
-        public TestProject()
-        {
-            this.TestSuites = new List<TestSuite>();
-        }
-
         public int Id { get; set; }
 
         public string Name { get; set; }
         
         public string Description { get; set; }
         
-        public List<TestSuite> TestSuites { get; set; }
+        public List<TestSuite> TestSuites { get; set; } = new List<TestSuite>();
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime InsertTime { get; set; }

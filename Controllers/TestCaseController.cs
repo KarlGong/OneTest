@@ -20,10 +20,9 @@ namespace OneTestApi.Controllers
             return _service.GetTestCase(id);
         }
 
-        [HttpPut("{id}")]
-        public int AddTestCase(int id, [FromBody] AddTestCaseParams ps)
+        [HttpPut]
+        public int AddTestCase([FromBody] AddTestCaseParams ps)
         {
-            ps.TestSuiteId = id;
             return _service.AddTestCase(ps);
         }
 
