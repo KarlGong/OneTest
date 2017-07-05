@@ -30,6 +30,20 @@ namespace OneTestApi.Controllers
         {
             return _service.GetTestProject(id);
         }
+        
+        [HttpGet("{id}/rootsuite")]
+        public TestNode GetRootTestSuite(int id)
+        {
+            var testSuite = _service.GetRootTestSuite(id);
+            return new TestNode()
+            {
+                Type = "rootSuite",
+                Id = testSuite.Id,
+                Name = testSuite.Name,
+                Order = testSuite.Order,
+                Count = testSuite.Count
+            };
+        }
 
         [HttpPut]
         public int AddTestProject([FromBody] AddTestProjectParams ps)

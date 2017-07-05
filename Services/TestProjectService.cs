@@ -26,6 +26,8 @@ namespace OneTestApi.Services
 
         TestProject GetTestProject(int projectId);
 
+        TestSuite GetRootTestSuite(int projectId);
+
         int AddTestProject(AddTestProjectParams ps);
 
         void UpdateTestProject(UpdateTestProjectParams ps);
@@ -40,7 +42,7 @@ namespace OneTestApi.Services
             _context = context;
         }
 
-
+        
         public IEnumerable<TestProject> GetTestProjects()
         {
             return _context.TestProjects.ToList();
@@ -49,6 +51,12 @@ namespace OneTestApi.Services
         public TestProject GetTestProject(int projectId)
         {
             return _context.TestProjects.Single(tp => tp.Id == projectId);
+        }
+        
+        public TestSuite GetRootTestSuite(int projectId)
+        {
+            return _context.TestProjects.Include(tp => tp.TestSuites)
+                .Single(tp => tp.Id == projectId).TestSuites.First();
         }
 
         public int AddTestProject(AddTestProjectParams ps)
@@ -62,7 +70,7 @@ namespace OneTestApi.Services
                     new TestSuite()
                     {
                         Name = ps.Name,
-                        Description = ps.Description,
+                        Description = "Root test suite",
                         Order = 0,
                         Count = 0
                     }

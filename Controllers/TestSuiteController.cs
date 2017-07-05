@@ -6,21 +6,6 @@ using OneTestApi.Services;
 
 namespace OneTestApi.Controllers
 {
-    public class TestNode
-    {
-        public string Type { get; set; }
-        
-        public int Id { get; set; }
-        
-        public string Name { get; set; }
-        
-        public int Order { get; set; }
-        
-        public int? Count { get; set; }
-        
-        public List<TestNode> Children { get; set; }= new List<TestNode>();
-    }
-
     [Route("api/suite")]
     public class TestSuiteController
     {
@@ -35,20 +20,6 @@ namespace OneTestApi.Controllers
         public TestSuite GetTestSuite(int id)
         {
             return _service.GetTestSuite(id);
-        }
-
-        [HttpGet("root")]
-        public TestNode GetRootTestSuite([FromQuery] int projectId)
-        {
-            var testSuite = _service.GetRootTestSuite(projectId);
-            return new TestNode()
-            {
-                Type = "rootSuite",
-                Id = testSuite.Id,
-                Name = testSuite.Name,
-                Order = testSuite.Order,
-                Count = testSuite.Count
-            };
         }
 
         [HttpGet("{id}/children")]
