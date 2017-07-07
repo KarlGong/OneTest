@@ -7,9 +7,9 @@ namespace OneTestApi.Models
     {
         public int Id { get; set; }
         
-        public string Value { get; set; }
+        public string Action { get; set; }
         
-        public bool IsVerification { get; set; }
+        public string ExpectedResult { get; set; }
         
         public TestCase TestCase { get; set; }
         

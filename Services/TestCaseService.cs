@@ -20,9 +20,9 @@ namespace OneTestApi.Services
 
         public class TestStep
         {
-            public string Value { get; set; }
+            public string Action { get; set; }
 
-            public bool IsVerification { get; set; }
+            public string ExpectedResult { get; set; }
         }
     }
 
@@ -40,9 +40,9 @@ namespace OneTestApi.Services
 
         public class TestStep
         {
-            public string Value { get; set; }
+            public string Action { get; set; }
 
-            public bool IsVerification { get; set; }
+            public string ExpectedResult { get; set; }
         }
     }
 
@@ -103,8 +103,8 @@ namespace OneTestApi.Services
                 TestSteps = new List<TestStep>(
                     ps.TestSteps.Select(ts => new TestStep()
                     {
-                        Value = ts.Value,
-                        IsVerification = ts.IsVerification,
+                        Action = ts.Action,
+                        ExpectedResult = ts.ExpectedResult,
                     })
                 )
             };
@@ -138,8 +138,8 @@ namespace OneTestApi.Services
             testCase.TestSteps = new List<TestStep>(
                 ps.TestSteps.Select(ts => new TestStep()
                 {
-                    Value = ts.Value,
-                    IsVerification = ts.IsVerification,
+                    Action = ts.Action,
+                    ExpectedResult = ts.ExpectedResult,
                 })
             );
 
