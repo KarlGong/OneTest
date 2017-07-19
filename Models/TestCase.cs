@@ -5,6 +5,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OneTestApi.Models
 {
+    public enum ExecutionType
+    {
+        Manual,
+        Automated
+    }
+
+    public enum Importance
+    {
+        High,
+        Medium,
+        Low
+    }
+    
     public class TestCase
     {
         public int Id { get; set; }
@@ -14,7 +27,13 @@ namespace OneTestApi.Models
         public string Summary { get; set; }
         
         public string Precondition { get; set; }
+
+        public ExecutionType ExecutionType { get; set; }
         
+        public Importance Importance { get; set; }
+        
+        public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
+
         public int Order { get; set; }
 
         public TestSuite TestSuite { get; set; }

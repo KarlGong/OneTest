@@ -16,7 +16,18 @@ namespace OneTestApi.Services
 
         public string Precondition { get; set; }
 
+        public ExecutionType ExecutionType { get; set; }
+
+        public Importance Importance { get; set; }
+
+        public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
+
         public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
+
+        public class TestCaseTag
+        {
+            public string Value { get; set; }
+        }
 
         public class TestStep
         {
@@ -36,7 +47,18 @@ namespace OneTestApi.Services
 
         public string Precondition { get; set; }
 
-        public List<TestStep> TestSteps { get; set; }  = new List<TestStep>();
+        public ExecutionType ExecutionType { get; set; }
+
+        public Importance Importance { get; set; }
+
+        public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
+
+        public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
+
+        public class TestCaseTag
+        {
+            public string Value { get; set; }
+        }
 
         public class TestStep
         {
@@ -69,7 +91,7 @@ namespace OneTestApi.Services
 
         public TestCase GetTestCase(int testCaseId)
         {
-            var testCase = _context.TestCases.Include(tc => tc.TestSteps).Single(tc => tc.Id == testCaseId);
+            var testCase = _context.TestCases.Include(tc => tc.TestSteps).Include(tc => tc.Tags).Single(tc => tc.Id == testCaseId);
 
             return testCase;
         }
@@ -77,8 +99,9 @@ namespace OneTestApi.Services
         public List<TestSuite> GetParentTestSuites(int testCaseId)
         {
             var parentSuites = new List<TestSuite>();
-            
-            var parentSuite = _context.TestCases.Include(tc => tc.TestSuite).Single(tc => tc.Id == testCaseId).TestSuite;
+
+            var parentSuite = _context.TestCases.Include(tc => tc.TestSuite).Single(tc => tc.Id == testCaseId)
+                .TestSuite;
 
             while (parentSuite != null)
             {
@@ -99,7 +122,15 @@ namespace OneTestApi.Services
                 Name = ps.Name,
                 Summary = ps.Summary,
                 Precondition = ps.Precondition,
+                ExecutionType = ps.ExecutionType,
+                Importance = ps.Importance,
                 Order = testSuite.Count,
+                Tags = new List<TestCaseTag>(
+                    ps.Tags.Select(t => new TestCaseTag()
+                    {
+                        Value = t.Value
+                    })
+                ),
                 TestSteps = new List<TestStep>(
                     ps.TestSteps.Select(ts => new TestStep()
                     {
@@ -110,12 +141,12 @@ namespace OneTestApi.Services
             };
 
             testSuite.TestCases.Add(newTestCase);
-            
+
             _context.SaveChanges();
-            
+
             // update count
             GetParentTestSuites(newTestCase.Id).ForEach(ts => ts.Count++);
-            
+
             _context.SaveChanges();
 
             return newTestCase.Id;
@@ -128,12 +159,21 @@ namespace OneTestApi.Services
             testCase.Name = ps.Name;
             testCase.Summary = ps.Summary;
             testCase.Precondition = ps.Precondition;
+            testCase.ExecutionType = ps.ExecutionType;
+            testCase.Importance = ps.Importance;
+
+            var oldTags = _context.TestCaseTags.Include(t => t.TestCase).Where(t => t.TestCase.Id == ps.Id);
+            _context.TestCaseTags.RemoveRange(oldTags);
+            
+            testCase.Tags = new List<TestCaseTag>(
+                ps.Tags.Select(t => new TestCaseTag()
+                {
+                    Value = t.Value
+                })
+            );
 
             var oldTestSteps = _context.TestSteps.Include(ts => ts.TestCase).Where(ts => ts.TestCase.Id == ps.Id);
-            foreach (var oldTestStep in oldTestSteps)
-            {
-                _context.TestSteps.Remove(oldTestStep);
-            }
+            _context.TestSteps.RemoveRange(oldTestSteps);
 
             testCase.TestSteps = new List<TestStep>(
                 ps.TestSteps.Select(ts => new TestStep()

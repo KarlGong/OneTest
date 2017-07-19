@@ -3,11 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OneTestApi.Models
 {
-    public class Sentence
+    public class TestCaseTag
     {
         public int Id { get; set; }
         
         public string Value { get; set; }
+        
+        public TestCase TestCase { get; set; }
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime InsertTime { get; set; }

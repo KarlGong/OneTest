@@ -15,7 +15,7 @@ namespace OneTestApi.Models
         public DbSet<TestSuite> TestSuites { get; set; }
         public DbSet<TestCase> TestCases { get; set; }
         public DbSet<TestStep> TestSteps { get; set; }
-        public DbSet<Sentence> Sentences { get; set; }
+        public DbSet<TestCaseTag> TestCaseTags { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
