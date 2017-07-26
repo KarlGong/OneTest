@@ -39,7 +39,6 @@ namespace OneTestApi.Controllers
                 Id = ts.Id,
                 Name = ts.Name,
                 Order = ts.Order,
-                Count = ts.Count
             })).OrderBy(tn => tn.Order);
         }
 

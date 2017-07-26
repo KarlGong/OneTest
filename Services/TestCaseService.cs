@@ -82,10 +82,12 @@ namespace OneTestApi.Services
     public class TestCaseService : ITestCaseService
     {
         private OneTestDbContext _context;
+        private ITestSuiteService _suiteService;
 
-        public TestCaseService(OneTestDbContext context)
+        public TestCaseService(OneTestDbContext context, ITestSuiteService suiteService)
         {
             _context = context;
+            _suiteService = suiteService;
         }
 
 
@@ -116,7 +118,7 @@ namespace OneTestApi.Services
         public int AddTestCase(AddTestCaseParams ps)
         {
             var testSuite = _context.TestSuites.Single(ts => ts.Id == ps.TestSuiteId);
-
+            
             var newTestCase = new TestCase()
             {
                 Name = ps.Name,
@@ -124,7 +126,7 @@ namespace OneTestApi.Services
                 Precondition = ps.Precondition,
                 ExecutionType = ps.ExecutionType,
                 Importance = ps.Importance,
-                Order = testSuite.Count,
+                Order = _suiteService.GetChildrenCount(ps.TestSuiteId),
                 Tags = new List<TestCaseTag>(
                     ps.Tags.Select(t => new TestCaseTag()
                     {
@@ -141,11 +143,6 @@ namespace OneTestApi.Services
             };
 
             testSuite.TestCases.Add(newTestCase);
-
-            _context.SaveChanges();
-
-            // update count
-            GetParentTestSuites(newTestCase.Id).ForEach(ts => ts.Count++);
 
             _context.SaveChanges();
 

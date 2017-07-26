@@ -41,7 +41,6 @@ namespace OneTestApi.Controllers
                 Id = testSuite.Id,
                 Name = testSuite.Name,
                 Order = testSuite.Order,
-                Count = testSuite.Count
             };
         }
 

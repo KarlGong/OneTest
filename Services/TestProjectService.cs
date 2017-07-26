@@ -72,7 +72,6 @@ namespace OneTestApi.Services
                         Name = ps.Name,
                         Description = "Root test suite",
                         Order = 0,
-                        Count = 0
                     }
                 }
             };

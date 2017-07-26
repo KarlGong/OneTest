@@ -21,8 +21,6 @@ namespace OneTestApi.Models
 
         public int Order { get; set; }
 
-        public int Count { get; set; }
-
         public TestSuite ParentTestSuite { get; set; }
 
         public TestProject TestProject { get; set; }
