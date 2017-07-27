@@ -77,6 +77,8 @@ namespace OneTestApi.Services
         int AddTestCase(AddTestCaseParams ps);
 
         void UpdateTestCase(UpdateTestCaseParams ps);
+
+        void DeleteTestCase(int testCaseId);
     }
 
     public class TestCaseService : ITestCaseService
@@ -93,8 +95,10 @@ namespace OneTestApi.Services
 
         public TestCase GetTestCase(int testCaseId)
         {
-            var testCase = _context.TestCases.Include(tc => tc.TestSteps).Include(tc => tc.Tags).Single(tc => tc.Id == testCaseId);
+            var testCase = _context.TestCases.Include(tc => tc.Tags).Single(tc => tc.Id == testCaseId);
 
+            testCase.TestSteps = _context.TestSteps.Where(ts => ts.TestCase.Id == testCaseId).OrderBy(ts => ts.Id).ToList();
+            
             return testCase;
         }
 
@@ -159,7 +163,7 @@ namespace OneTestApi.Services
             testCase.ExecutionType = ps.ExecutionType;
             testCase.Importance = ps.Importance;
 
-            var oldTags = _context.TestCaseTags.Include(t => t.TestCase).Where(t => t.TestCase.Id == ps.Id);
+            var oldTags = _context.TestCaseTags.Where(t => t.TestCase.Id == ps.Id);
             _context.TestCaseTags.RemoveRange(oldTags);
             
             testCase.Tags = new List<TestCaseTag>(
@@ -169,7 +173,7 @@ namespace OneTestApi.Services
                 })
             );
 
-            var oldTestSteps = _context.TestSteps.Include(ts => ts.TestCase).Where(ts => ts.TestCase.Id == ps.Id);
+            var oldTestSteps = _context.TestSteps.Where(ts => ts.TestCase.Id == ps.Id);
             _context.TestSteps.RemoveRange(oldTestSteps);
 
             testCase.TestSteps = new List<TestStep>(
@@ -179,6 +183,16 @@ namespace OneTestApi.Services
                     ExpectedResult = ts.ExpectedResult,
                 })
             );
+
+            _context.SaveChanges();
+        }
+
+        public void DeleteTestCase(int testCaseId)
+        {
+            _context.TestCases.Remove(new TestCase()
+            {
+                Id = testCaseId
+            });
 
             _context.SaveChanges();
         }

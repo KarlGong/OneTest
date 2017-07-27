@@ -36,6 +36,8 @@ namespace OneTestApi.Services
         int AddTestSuite(AddTestSuiteParams ps);
 
         void UpdateTestSuite(UpdateTestSuiteParams ps);
+
+        void DeleteTestSuite(int testSuiteId);
     }
 
     public class TestSuiteService : ITestSuiteService
@@ -66,18 +68,18 @@ namespace OneTestApi.Services
 
         public int AddTestSuite(AddTestSuiteParams ps)
         {
-            var parent = _context.TestSuites.Include(ts => ts.TestProject).Single(ts => ts.Id == ps.ParentSuiteId);
+            var parentSuite = _context.TestSuites.Include(ts => ts.TestProject).Single(ts => ts.Id == ps.ParentSuiteId);
 
             var testSuite = new TestSuite()
             {
                 Name = ps.Name,
                 Description = ps.Description,
                 Order = GetChildrenCount(ps.ParentSuiteId),
-                ParentTestSuite = parent,
-                TestProject = parent.TestProject
+                ParentTestSuite = parentSuite,
+                TestProject = parentSuite.TestProject
             };
 
-            parent.TestSuites.Add(testSuite);
+            parentSuite.TestSuites.Add(testSuite);
 
             _context.SaveChanges();
 
@@ -90,6 +92,16 @@ namespace OneTestApi.Services
 
             testSuite.Name = ps.Name;
             testSuite.Description = ps.Description;
+
+            _context.SaveChanges();
+        }
+
+        public void DeleteTestSuite(int testSuiteId)
+        {
+            _context.TestSuites.Remove(new TestSuite()
+            {
+                Id = testSuiteId
+            });
 
             _context.SaveChanges();
         }

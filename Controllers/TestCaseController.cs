@@ -33,5 +33,11 @@ namespace OneTestApi.Controllers
             _service.UpdateTestCase(ps);
         }
 
+        [HttpDelete("{id}")]
+        public void DeleteTestCase(int id)
+        {
+            _service.DeleteTestCase(id);
+        }
+
     }
 }

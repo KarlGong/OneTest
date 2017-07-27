@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OneTestApi.Models
@@ -9,6 +10,7 @@ namespace OneTestApi.Models
         
         public string Value { get; set; }
         
+        [Required]
         public TestCase TestCase { get; set; }
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

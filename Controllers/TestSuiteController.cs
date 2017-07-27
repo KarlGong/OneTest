@@ -31,14 +31,13 @@ namespace OneTestApi.Controllers
                 Type = "case",
                 Id = tc.Id,
                 Name = tc.Name,
-                Order = tc.Order,
-                Count = null
+                Order = tc.Order
             }).Union(testSuite.TestSuites.Select(ts => new TestNode()
             {
                 Type = "suite",
                 Id = ts.Id,
                 Name = ts.Name,
-                Order = ts.Order,
+                Order = ts.Order
             })).OrderBy(tn => tn.Order);
         }
 
@@ -53,6 +52,12 @@ namespace OneTestApi.Controllers
         {
             ps.Id = id;
             _service.UpdateTestSuite(ps);
+        }
+
+        [HttpDelete("{id}")]
+        public void DeleteTestSuite(int id)
+        {
+            _service.DeleteTestSuite(id);
         }
 
     }

@@ -12,8 +12,6 @@ namespace OneTestApi.Controllers
         
         public int Order { get; set; }
         
-        public int? Count { get; set; }
-        
         public List<TestNode> Children { get; set; }= new List<TestNode>();
     }
 }

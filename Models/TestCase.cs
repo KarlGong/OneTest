@@ -35,7 +35,8 @@ namespace OneTestApi.Models
         public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
 
         public int Order { get; set; }
-
+        
+        [Required]
         public TestSuite TestSuite { get; set; }
         
         public List<TestStep> TestSteps { get; set; } = new List<TestStep>();

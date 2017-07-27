@@ -85,7 +85,7 @@ namespace OneTestApi.Services
 
         public void UpdateTestProject(UpdateTestProjectParams ps)
         {
-            var testProject = _context.TestProjects.Include(tp => tp.TestSuites).Single(tp => tp.Id == ps.Id);
+            var testProject = _context.TestProjects.Single(tp => tp.Id == ps.Id);
 
             testProject.Name = ps.Name;
             testProject.Description = ps.Description;
