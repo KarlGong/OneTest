@@ -68,15 +68,29 @@ namespace OneTestApi.Services
         }
     }
 
+    public class MoveTestCaseParams
+    {
+        public int Id { get; set; }
+        
+        public int TestSuiteId { get; set; }
+        
+        public int Position { get; set; }
+    }
+
     public interface ITestCaseService
     {
         TestCase GetTestCase(int testCaseId);
 
         TestCase AddTestCase(AddTestCaseParams ps);
+        
+        TestSuite GetParentTestSuite(int testCaseId);
 
         void UpdateTestCase(UpdateTestCaseParams ps);
 
         void DeleteTestCase(int testCaseId);
+
+        void MoveTestCase(MoveTestCaseParams ps);
+        
     }
 
     public class TestCaseService : ITestCaseService
@@ -134,6 +148,12 @@ namespace OneTestApi.Services
             return newTestCase;
         }
 
+        public TestSuite GetParentTestSuite(int testCaseId)
+        {
+            return _context.TestCases.Include(tc => tc.TestSuite).Single(tc => tc.Id == testCaseId)
+                .TestSuite;
+        }
+
         public void UpdateTestCase(UpdateTestCaseParams ps)
         {
             var testCase = _context.TestCases.Single(tc => tc.Id == ps.Id);
@@ -170,12 +190,39 @@ namespace OneTestApi.Services
 
         public void DeleteTestCase(int testCaseId)
         {
-            _context.TestCases.Remove(new TestCase()
-            {
-                Id = testCaseId
-            });
+            var testCase = GetTestCase(testCaseId);
+            
+            _suiteService.RemovePosition(GetParentTestSuite(testCaseId).Id, testCase.Order);
+
+            _context.TestCases.Remove(testCase);
 
             _context.SaveChanges();
+        }
+
+        public void MoveTestCase(MoveTestCaseParams ps)
+        {
+            var testCase = GetTestCase(ps.Id);
+
+            _suiteService.RemovePosition(GetParentTestSuite(testCase.Id).Id, testCase.Order);
+
+            if (ps.Position == -1)
+            {
+                testCase.TestSuite = _suiteService.GetTestSuite(ps.TestSuiteId);
+
+                testCase.Order = _suiteService.GetChildrenCount(ps.TestSuiteId);
+
+                _context.SaveChanges();
+            }
+            else
+            {
+                _suiteService.InsertPosition(ps.TestSuiteId, ps.Position);
+
+                testCase.TestSuite = _suiteService.GetTestSuite(ps.TestSuiteId);
+
+                testCase.Order = ps.Position;
+
+                _context.SaveChanges();
+            }
         }
     }
 }

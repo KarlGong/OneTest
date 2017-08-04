@@ -39,5 +39,11 @@ namespace OneTestApi.Controllers
             _service.DeleteTestCase(id);
         }
 
+        [HttpPost("{id}/move")]
+        public void MoveTestCase(int id, [FromBody] MoveTestCaseParams ps)
+        {
+            ps.Id = id;
+            _service.MoveTestCase(ps);
+        }
     }
 }
