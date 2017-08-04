@@ -21,7 +21,7 @@ namespace OneTestApi.Controllers
         }
 
         [HttpPut]
-        public int AddTestCase([FromBody] AddTestCaseParams ps)
+        public TestCase AddTestCase([FromBody] AddTestCaseParams ps)
         {
             return _service.AddTestCase(ps);
         }

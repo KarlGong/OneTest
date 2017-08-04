@@ -33,7 +33,7 @@ namespace OneTestApi.Services
 
         int GetChildrenCount(int testSuiteId);
 
-        int AddTestSuite(AddTestSuiteParams ps);
+        TestSuite AddTestSuite(AddTestSuiteParams ps);
 
         void UpdateTestSuite(UpdateTestSuiteParams ps);
 
@@ -66,7 +66,7 @@ namespace OneTestApi.Services
                    + _context.TestSuites.Count(ts => ts.ParentTestSuite.Id == testSuiteId);
         }
 
-        public int AddTestSuite(AddTestSuiteParams ps)
+        public TestSuite AddTestSuite(AddTestSuiteParams ps)
         {
             var parentSuite = _context.TestSuites.Include(ts => ts.TestProject).Single(ts => ts.Id == ps.ParentSuiteId);
 
@@ -83,7 +83,7 @@ namespace OneTestApi.Services
 
             _context.SaveChanges();
 
-            return testSuite.Id;
+            return testSuite;
         }
 
         public void UpdateTestSuite(UpdateTestSuiteParams ps)
@@ -102,7 +102,7 @@ namespace OneTestApi.Services
             {
                 Id = testSuiteId
             });
-
+            
             _context.SaveChanges();
         }
     }

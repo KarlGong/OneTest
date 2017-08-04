@@ -72,9 +72,7 @@ namespace OneTestApi.Services
     {
         TestCase GetTestCase(int testCaseId);
 
-        List<TestSuite> GetParentTestSuites(int testCaseId);
-
-        int AddTestCase(AddTestCaseParams ps);
+        TestCase AddTestCase(AddTestCaseParams ps);
 
         void UpdateTestCase(UpdateTestCaseParams ps);
 
@@ -102,24 +100,7 @@ namespace OneTestApi.Services
             return testCase;
         }
 
-        public List<TestSuite> GetParentTestSuites(int testCaseId)
-        {
-            var parentSuites = new List<TestSuite>();
-
-            var parentSuite = _context.TestCases.Include(tc => tc.TestSuite).Single(tc => tc.Id == testCaseId)
-                .TestSuite;
-
-            while (parentSuite != null)
-            {
-                parentSuites.Add(parentSuite);
-                parentSuite = _context.TestSuites.Include(ts => ts.ParentTestSuite)
-                    .Single(ts => ts.Id == parentSuite.Id).ParentTestSuite;
-            }
-            parentSuites.Reverse();
-            return parentSuites;
-        }
-
-        public int AddTestCase(AddTestCaseParams ps)
+        public TestCase AddTestCase(AddTestCaseParams ps)
         {
             var testSuite = _context.TestSuites.Single(ts => ts.Id == ps.TestSuiteId);
             
@@ -150,7 +131,7 @@ namespace OneTestApi.Services
 
             _context.SaveChanges();
 
-            return newTestCase.Id;
+            return newTestCase;
         }
 
         public void UpdateTestCase(UpdateTestCaseParams ps)

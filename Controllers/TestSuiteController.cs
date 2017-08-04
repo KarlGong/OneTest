@@ -42,7 +42,7 @@ namespace OneTestApi.Controllers
         }
 
         [HttpPut]
-        public int AddTestSuite([FromBody] AddTestSuiteParams ps)
+        public TestSuite AddTestSuite([FromBody] AddTestSuiteParams ps)
         {
             return _service.AddTestSuite(ps);
         }

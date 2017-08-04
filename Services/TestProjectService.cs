@@ -70,7 +70,7 @@ namespace OneTestApi.Services
                     new TestSuite()
                     {
                         Name = ps.Name,
-                        Description = "Root test suite",
+                        Description = "<p>Root test suite</p>",
                         Order = 0,
                     }
                 }
