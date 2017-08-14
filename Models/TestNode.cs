@@ -1,26 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OneTestApi.Models
 {
-    public class TestStep
+    public abstract class TestNode
     {
         public int Id { get; set; }
         
-        public string Action { get; set; }
-        
-        public string ExpectedResult { get; set; }
-        
-        public int TestCaseId { get; set; }
-        
         [Required]
-        [ForeignKey("TestCaseId")]
-        public TestCase TestCase { get; set; }
+        public string Name { get; set; }
+        
+        public int Position { get; set; }
+        
+        public int? ParentId { get; set; }
+        
+        [ForeignKey("ParentId")]
+        public TestNode Parent { get; set; }
+
+        public List<TestNode> Children { get; set; } = new List<TestNode>();
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime InsertTime { get; set; }
-        
+
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdateTime { get; set; }
     }

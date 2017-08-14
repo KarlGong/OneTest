@@ -5,46 +5,31 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OneTestApi.Models
 {
-    public enum ExecutionType
+    public enum TestCaseExecutionType
     {
         Manual,
         Automated
     }
 
-    public enum Importance
+    public enum TestCaseImportance
     {
         High,
         Medium,
         Low
     }
     
-    public class TestCase
+    public class TestCase : TestNode
     {
-        public int Id { get; set; }
-        
-        public string Name { get; set; }
-        
         public string Summary { get; set; }
         
         public string Precondition { get; set; }
 
-        public ExecutionType ExecutionType { get; set; }
+        public TestCaseExecutionType ExecutionType { get; set; }
         
-        public Importance Importance { get; set; }
+        public TestCaseImportance Importance { get; set; }
         
         public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
 
-        public int Order { get; set; }
-        
-        [Required]
-        public TestSuite TestSuite { get; set; }
-        
         public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
-        
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime InsertTime { get; set; }
-        
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime UpdateTime { get; set; }
     }
 }

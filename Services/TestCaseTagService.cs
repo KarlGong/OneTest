@@ -20,7 +20,7 @@ namespace OneTestApi.Services
 
         public List<string> SearchTags(string searchText, int limit)
         {
-            return _context.TestCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText)).Distinct().Take(limit).ToList();
+            return _context.TestCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText ?? "")).Distinct().Take(limit).ToList();
         }
     }
 }

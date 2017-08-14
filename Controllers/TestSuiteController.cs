@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using OneTestApi.Controllers.DTOs;
+using OneTestApi.Controllers.Params;
 using OneTestApi.Models;
 using OneTestApi.Services;
 
@@ -10,54 +13,60 @@ namespace OneTestApi.Controllers
     public class TestSuiteController
     {
         private readonly ITestSuiteService _service;
+        private readonly IMapper _mapper;
 
-        public TestSuiteController(ITestSuiteService service)
+        public TestSuiteController(ITestSuiteService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
         
         [HttpGet("{id}")]
-        public TestSuite GetTestSuite(int id)
+        public TestSuiteDto GetTestSuite(int id)
         {
-            return _service.GetTestSuite(id);
+            return _mapper.Map<TestSuiteDto>(_service.Get(id));
         }
-
+        
         [HttpGet("{id}/children")]
-        public IEnumerable<TestNode> GetChildren(int id)
+        public List<object> GetChildren(int id)
         {
-            var testSuite = _service.GetTestSuiteDetail(id);
-            return testSuite.TestCases.Select(tc => new TestNode()
+            var children = new List<object>();
+            foreach (var testNode in _service.GetChildren(id))
             {
-                Type = "case",
-                Id = tc.Id,
-                Name = tc.Name,
-                Order = tc.Order
-            }).Union(testSuite.TestSuites.Select(ts => new TestNode()
-            {
-                Type = "suite",
-                Id = ts.Id,
-                Name = ts.Name,
-                Order = ts.Order
-            })).OrderBy(tn => tn.Order);
+                if (testNode is TestCase)
+                {
+                    children.Add(_mapper.Map<TestCaseDto>(testNode));
+                } else if (testNode is TestSuite)
+                {
+                    children.Add(_mapper.Map<TestSuiteDto>(testNode));
+                }
+            }
+            return children;
         }
 
         [HttpPut]
-        public TestSuite AddTestSuite([FromBody] AddTestSuiteParams ps)
+        public TestSuiteDto AddTestSuite([FromBody] AddTestSuiteParams ps)
         {
-            return _service.AddTestSuite(ps);
+            return _mapper.Map<TestSuiteDto>(_service.Add(ps));
         }
 
         [HttpPost("{id}")]
-        public void UpdateTestSuite(int id, [FromBody] UpdateTestSuiteParams ps)
+        public TestSuiteDto UpdateTestSuite(int id, [FromBody] UpdateTestSuiteParams ps)
         {
             ps.Id = id;
-            _service.UpdateTestSuite(ps);
+            return _mapper.Map<TestSuiteDto>(_service.Update(ps));
+        }
+
+        [HttpPost("{id}")]
+        public void MoveTestSuite(int id, [FromQuery] int toParentId, [FromQuery] int toPosition)
+        {
+            _service.Move(id, toParentId, toPosition);
         }
 
         [HttpDelete("{id}")]
         public void DeleteTestSuite(int id)
         {
-            _service.DeleteTestSuite(id);
+            _service.Delete(id);
         }
 
     }

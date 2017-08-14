@@ -18,7 +18,7 @@ namespace OneTestApi.Controllers
         [HttpGet]
         public List<string> SearchTags([FromQuery] string searchText, [FromQuery] int limit)
         {
-            return _service.SearchTags(searchText ?? "", limit);
+            return _service.SearchTags(searchText, limit);
         }
     }
 }

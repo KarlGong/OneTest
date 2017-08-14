@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OneTestApi.Models;
 using OneTestApi.Services;
+using OneTestApi.Utils;
 
 namespace OneTestApi
 {
@@ -38,6 +40,14 @@ namespace OneTestApi
 
             services.AddDbContext<OneTestDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("mysql")));
+
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.CreateMap<TestCaseExecutionType, string>().ConvertUsing(s => s.ToString().ToLower());
+                cfg.CreateMap<TestCaseImportance, string>().ConvertUsing(s => s.ToString().ToLower());
+                cfg.CreateMap<string, TestCaseExecutionType>().ConvertUsing(s => s.ToEnum<TestCaseExecutionType>());
+                cfg.CreateMap<string, TestCaseImportance>().ConvertUsing(s => s.ToEnum<TestCaseImportance>())
+            });
 
             services.AddTransient<ITestProjectService, TestProjectService>();
             services.AddTransient<ITestSuiteService, TestSuiteService>();

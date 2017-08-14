@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using OneTestApi.Controllers.DTOs;
 using OneTestApi.Models;
 using OneTestApi.Services;
 
@@ -8,42 +11,43 @@ namespace OneTestApi.Controllers
     public class TestCaseController
     {
         private readonly ITestCaseService _service;
+        private readonly IMapper _mapper;
 
-        public TestCaseController(ITestCaseService service)
+        public TestCaseController(ITestCaseService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
         
         [HttpGet("{id}")]
-        public TestCase GetTestCase(int id)
+        public TestCaseDto GetTestCase(int id)
         {
-            return _service.GetTestCase(id);
+            return _mapper.Map<TestCaseDto>(_service.Get(id));
         }
 
         [HttpPut]
-        public TestCase AddTestCase([FromBody] AddTestCaseParams ps)
+        public TestCaseDto AddTestCase([FromBody] AddTestCaseParams ps)
         {
-            return _service.AddTestCase(ps);
+            return _mapper.Map<TestCaseDto>(_service.Add(ps));
         }
 
         [HttpPost("{id}")]
-        public void UpdateTestCase(int id, [FromBody] UpdateTestCaseParams ps)
+        public TestCaseDto UpdateTestCase(int id, [FromBody] UpdateTestCaseParams ps)
         {
             ps.Id = id;
-            _service.UpdateTestCase(ps);
+            return _mapper.Map<TestCaseDto>(_service.Update(ps));
+        }
+        
+        [HttpPost("{id}")]
+        public void MoveTestCase(int id, [FromQuery] int toParentId, [FromQuery] int toPosition)
+        {
+            _service.Move(id, toParentId, toPosition);
         }
 
         [HttpDelete("{id}")]
         public void DeleteTestCase(int id)
         {
-            _service.DeleteTestCase(id);
-        }
-
-        [HttpPost("{id}/move")]
-        public void MoveTestCase(int id, [FromBody] MoveTestCaseParams ps)
-        {
-            ps.Id = id;
-            _service.MoveTestCase(ps);
+            _service.Delete(id);
         }
     }
 }

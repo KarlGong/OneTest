@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OneTestApi.Models;
 
@@ -8,14 +9,15 @@ namespace OneTestApi.Services
 {
     public class AddTestSuiteParams
     {
-        public int ParentSuiteId { get; set; }
+        public int ParentId { get; set; }
 
+        public int Position { get; set; }
+        
         public string Name { get; set; }
 
         public string Description { get; set; }
     }
-
-
+    
     public class UpdateTestSuiteParams
     {
         public int Id { get; set; }
@@ -24,129 +26,142 @@ namespace OneTestApi.Services
 
         public string Description { get; set; }
     }
-
+    
     public interface ITestSuiteService
     {
-        TestSuite GetTestSuite(int suiteId);
+        TestSuite Get(int id);
 
-        TestSuite GetTestSuiteDetail(int suiteId);
+        TestNode GetParent(int id);
 
-        int GetChildrenCount(int testSuiteId);
+        List<TestNode> GetChildren(int id);
+
+        TestSuite Add(AddTestSuiteParams ps);
+
+        TestSuite Update(UpdateTestSuiteParams ps);
+
+        void Move(int id, int toParentId, int toPosition);
         
-        TestSuite GetParentTestSuite(int testSuiteId);
-
-        TestSuite AddTestSuite(AddTestSuiteParams ps);
-
-        void UpdateTestSuite(UpdateTestSuiteParams ps);
-
-        void DeleteTestSuite(int testSuiteId);
-
-        void RemovePosition(int suiteId, int pos);
-
-        void InsertPosition(int suiteId, int pos);
+        void Delete(int id);
     }
 
     public class TestSuiteService : ITestSuiteService
     {
-        private OneTestDbContext _context;
+        private readonly OneTestDbContext _context;
 
-        public TestSuiteService(OneTestDbContext context)
+        private readonly IMapper _mapper;
+
+        public TestSuiteService(OneTestDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public TestSuite GetTestSuite(int suiteId)
+        public TestSuite Get(int id)
         {
-            return _context.TestSuites.Single(ts => ts.Id == suiteId);
+            return _context.TestSuites.Single(ts => ts.Id == id);
         }
 
-        public TestSuite GetTestSuiteDetail(int suiteId)
+        public TestNode GetParent(int id)
         {
-            return _context.TestSuites.Include(ts => ts.TestSuites).Include(ts => ts.TestCases)
-                .Single(ts => ts.Id == suiteId);
+            return _context.TestSuites.Include(tn => tn.Parent).Single(tn => tn.Id == id).Parent;
         }
 
-        public int GetChildrenCount(int testSuiteId)
+        public List<TestNode> GetChildren(int id)
         {
-            return _context.TestCases.Count(tc => tc.TestSuite.Id == testSuiteId)
-                   + _context.TestSuites.Count(ts => ts.ParentTestSuite.Id == testSuiteId);
+            return _context.TestSuites.Include(ts => ts.Children).Single(ts => ts.Id == id).Children;
         }
 
-        public TestSuite GetParentTestSuite(int testSuiteId)
+        public TestSuite Add(AddTestSuiteParams ps)
         {
-            return _context.TestSuites.Include(tc => tc.ParentTestSuite).Single(tc => tc.Id == testSuiteId)
-                .ParentTestSuite;
-        }
+            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == ps.ParentId);
+            ps.Position = ps.Position == -1 ? sibingsCount : Math.Min(ps.Position, sibingsCount);
 
-        public TestSuite AddTestSuite(AddTestSuiteParams ps)
-        {
-            var parentSuite = _context.TestSuites.Include(ts => ts.TestProject).Single(ts => ts.Id == ps.ParentSuiteId);
-
-            var testSuite = new TestSuite()
+            foreach (var node in _context.TestNodes.Where(tn =>
+                tn.ParentId == ps.ParentId && tn.Position >= ps.Position))
             {
-                Name = ps.Name,
-                Description = ps.Description,
-                Order = GetChildrenCount(ps.ParentSuiteId),
-                ParentTestSuite = parentSuite,
-                TestProject = parentSuite.TestProject
-            };
+                node.Position++;
+            }
 
-            parentSuite.TestSuites.Add(testSuite);
+            var testSuite = _mapper.Map<TestSuite>(ps);
+            
+            _context.TestSuites.Add(testSuite);
 
             _context.SaveChanges();
 
             return testSuite;
         }
 
-        public void UpdateTestSuite(UpdateTestSuiteParams ps)
+        public TestSuite Update(UpdateTestSuiteParams ps)
         {
-            var testSuite = _context.TestSuites.Single(ts => ts.Id == ps.Id);
+            var previousTestSuite = Get(ps.Id);
 
-            testSuite.Name = ps.Name;
-            testSuite.Description = ps.Description;
+            _mapper.Map(ps, previousTestSuite);
+
+            _context.SaveChanges();
+
+            return previousTestSuite;
+        }
+
+        public void Move(int id, int toParentId, int toPosition)
+        {
+            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == toParentId);
+            toPosition = toPosition <= -1 ? sibingsCount : Math.Min(toPosition, sibingsCount);
+
+            var previousTestSuite = Get(id);
+
+            if (previousTestSuite.ParentId == toParentId)
+            {
+                if (previousTestSuite.Position > toPosition)
+                {
+                    foreach (var node in _context.TestNodes.Where(tn =>
+                        tn.ParentId == toParentId && tn.Position >= toPosition &&
+                        tn.Position < previousTestSuite.Position))
+                    {
+                        node.Position++;
+                    }
+                }
+                else if (previousTestSuite.Position < toPosition)
+                {
+                    foreach (var node in _context.TestNodes.Where(tn =>
+                        tn.ParentId == toParentId && tn.Position <= toPosition &&
+                        tn.Position > previousTestSuite.Position))
+                    {
+                        node.Position--;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var node in _context.TestNodes.Where(tn =>
+                    tn.ParentId == previousTestSuite.ParentId && tn.Position > previousTestSuite.Position))
+                {
+                    node.Position--;
+                }
+
+                foreach (var node in _context.TestNodes.Where(tn =>
+                    tn.ParentId == toParentId && tn.Position >= toPosition))
+                {
+                    node.Position++;
+                }
+            }
+
+            previousTestSuite.ParentId = toParentId;
+            previousTestSuite.Position = toPosition;
 
             _context.SaveChanges();
         }
 
-        public void DeleteTestSuite(int testSuiteId)
+        public void Delete(int id)
         {
-            var testSuite = GetTestSuite(testSuiteId);
-            
-            RemovePosition(GetParentTestSuite(testSuiteId).Id, testSuite.Order);
+            var testSuite = Get(id);
+
+            foreach (var node in _context.TestNodes.Where(tn =>
+                tn.ParentId == testSuite.ParentId && tn.Position > testSuite.Position))
+            {
+                node.Position--;
+            }
 
             _context.TestSuites.Remove(testSuite);
-
-            _context.SaveChanges();
-        }
-
-        public void RemovePosition(int suiteId, int pos)
-        {
-            var parenTestSuite = GetTestSuiteDetail(suiteId);
-            foreach (var testCase in parenTestSuite.TestCases.Where(tc => tc.Order > pos))
-            {
-                testCase.Order--;
-            }
-
-            foreach (var testSuite in parenTestSuite.TestSuites.Where(tc => tc.Order > pos))
-            {
-                testSuite.Order--;
-            }
-
-            _context.SaveChanges();
-        }
-
-        public void InsertPosition(int suiteId, int pos)
-        {
-            var parenTestSuite = GetTestSuiteDetail(suiteId);
-            foreach (var testCase in parenTestSuite.TestCases.Where(tc => tc.Order >= pos))
-            {
-                testCase.Order++;
-            }
-
-            foreach (var testSuite in parenTestSuite.TestSuites.Where(tc => tc.Order >= pos))
-            {
-                testSuite.Order++;
-            }
 
             _context.SaveChanges();
         }

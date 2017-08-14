@@ -13,6 +13,7 @@ namespace OneTestApi.Models
         {
         }
 
+        public DbSet<TestNode> TestNodes { get; set; }
         public DbSet<TestProject> TestProjects { get; set; }
         public DbSet<TestSuite> TestSuites { get; set; }
         public DbSet<TestCase> TestCases { get; set; }
@@ -22,10 +23,8 @@ namespace OneTestApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-            {
-                relationship.DeleteBehavior = DeleteBehavior.Cascade;
-            }
+            modelBuilder.Entity<TestNode>().HasOne(tn => tn.Parent).WithMany(tn => tn.Children)
+                .HasForeignKey(tn => tn.ParentId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

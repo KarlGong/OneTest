@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography.X509Certificates;
 
 namespace OneTestApi.Models
 {
@@ -8,9 +9,13 @@ namespace OneTestApi.Models
     {
         public int Id { get; set; }
         
+        [Required]
         public string Value { get; set; }
         
+        public int TestCaseId { get; set; }
+        
         [Required]
+        [ForeignKey("TestCaseId")]
         public TestCase TestCase { get; set; }
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
