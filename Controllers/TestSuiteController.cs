@@ -3,7 +3,6 @@ using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using OneTestApi.Controllers.DTOs;
-using OneTestApi.Controllers.Params;
 using OneTestApi.Models;
 using OneTestApi.Services;
 
@@ -20,15 +19,15 @@ namespace OneTestApi.Controllers
             _service = service;
             _mapper = mapper;
         }
-        
+
         [HttpGet("{id}")]
-        public TestSuiteDto GetTestSuite(int id)
+        public TestSuiteDto GetTestSuite([FromRoute] int id)
         {
             return _mapper.Map<TestSuiteDto>(_service.Get(id));
         }
-        
+
         [HttpGet("{id}/children")]
-        public List<object> GetChildren(int id)
+        public List<object> GetChildren([FromRoute] int id)
         {
             var children = new List<object>();
             foreach (var testNode in _service.GetChildren(id))
@@ -36,7 +35,8 @@ namespace OneTestApi.Controllers
                 if (testNode is TestCase)
                 {
                     children.Add(_mapper.Map<TestCaseDto>(testNode));
-                } else if (testNode is TestSuite)
+                }
+                else if (testNode is TestSuite)
                 {
                     children.Add(_mapper.Map<TestSuiteDto>(testNode));
                 }
@@ -51,14 +51,14 @@ namespace OneTestApi.Controllers
         }
 
         [HttpPost("{id}")]
-        public TestSuiteDto UpdateTestSuite(int id, [FromBody] UpdateTestSuiteParams ps)
+        public TestSuiteDto UpdateTestSuite([FromRoute] int id, [FromBody] UpdateTestSuiteParams ps)
         {
             ps.Id = id;
             return _mapper.Map<TestSuiteDto>(_service.Update(ps));
         }
 
         [HttpPost("{id}")]
-        public void MoveTestSuite(int id, [FromQuery] int toParentId, [FromQuery] int toPosition)
+        public void MoveTestSuite([FromRoute] int id, [FromBody] int toParentId, [FromBody] int toPosition)
         {
             _service.Move(id, toParentId, toPosition);
         }
@@ -68,6 +68,5 @@ namespace OneTestApi.Controllers
         {
             _service.Delete(id);
         }
-
     }
 }

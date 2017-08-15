@@ -6,7 +6,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using OneTestApi.Controllers.DTOs;
-using OneTestApi.Controllers.Params;
 using OneTestApi.Models;
 using OneTestApi.Services;
 
@@ -29,15 +28,15 @@ namespace OneTestApi.Controllers
         {
             return _mapper.Map<List<TestProjectDto>>(_service.GetAll());
         }
-        
+
         [HttpGet("{id}")]
-        public TestProjectDto GetTestProject(int id)
+        public TestProjectDto GetTestProject([FromRoute] int id)
         {
             return _mapper.Map<TestProjectDto>(_service.Get(id));
         }
 
         [HttpGet("{id}/children")]
-        public List<object> GetChildren(int id)
+        public List<object> GetChildren([FromRoute] int id)
         {
             var children = new List<object>();
             foreach (var testNode in _service.GetChildren(id))
@@ -45,7 +44,8 @@ namespace OneTestApi.Controllers
                 if (testNode is TestCase)
                 {
                     children.Add(_mapper.Map<TestCaseDto>(testNode));
-                } else if (testNode is TestSuite)
+                }
+                else if (testNode is TestSuite)
                 {
                     children.Add(_mapper.Map<TestSuiteDto>(testNode));
                 }
@@ -60,20 +60,20 @@ namespace OneTestApi.Controllers
         }
 
         [HttpPost("{id}")]
-        public TestProjectDto UpdateTestProject(int id, [FromBody] UpdateTestProjectParams ps)
+        public TestProjectDto UpdateTestProject([FromRoute] int id, [FromBody] UpdateTestProjectParams ps)
         {
             ps.Id = id;
             return _mapper.Map<TestProjectDto>(_service.Update(ps));
         }
 
         [HttpPost("{id}/move")]
-        public void MoveTestProject(int id, [FromQuery] int toPosition)
+        public void MoveTestProject([FromRoute] int id, [FromBody] int toPosition)
         {
             _service.Move(id, toPosition);
         }
 
         [HttpDelete("{id}")]
-        public void DeleteTestProject(int id)
+        public void DeleteTestProject([FromRoute] int id)
         {
             _service.Delete(id);
         }

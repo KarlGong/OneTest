@@ -9,9 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using OneTestApi.Models;
 using OneTestApi.Services;
-using OneTestApi.Utils;
 
 namespace OneTestApi
 {
@@ -32,22 +33,17 @@ namespace OneTestApi
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc()
-                .AddJsonOptions(
-                    options => options.SerializerSettings.ReferenceLoopHandling =
-                        Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                );
+            services.AddMvc().AddJsonOptions(
+                options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
+                });
 
             services.AddDbContext<OneTestDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("mysql")));
 
-            services.AddAutoMapper(cfg =>
-            {
-                cfg.CreateMap<TestCaseExecutionType, string>().ConvertUsing(s => s.ToString().ToLower());
-                cfg.CreateMap<TestCaseImportance, string>().ConvertUsing(s => s.ToString().ToLower());
-                cfg.CreateMap<string, TestCaseExecutionType>().ConvertUsing(s => s.ToEnum<TestCaseExecutionType>());
-                cfg.CreateMap<string, TestCaseImportance>().ConvertUsing(s => s.ToEnum<TestCaseImportance>())
-            });
+            services.AddAutoMapper();
 
             services.AddTransient<ITestProjectService, TestProjectService>();
             services.AddTransient<ITestSuiteService, TestSuiteService>();

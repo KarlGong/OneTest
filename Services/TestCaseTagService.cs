@@ -18,7 +18,7 @@ namespace OneTestApi.Services
             _context = context;
         }
 
-        public List<string> SearchTags(string searchText, int limit)
+        public List<string> SearchTags(string searchText = "", int limit = 10)
         {
             return _context.TestCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText ?? "")).Distinct().Take(limit).ToList();
         }

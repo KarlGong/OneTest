@@ -18,9 +18,9 @@ namespace OneTestApi.Controllers
             _service = service;
             _mapper = mapper;
         }
-        
+
         [HttpGet("{id}")]
-        public TestCaseDto GetTestCase(int id)
+        public TestCaseDto GetTestCase([FromRoute] int id)
         {
             return _mapper.Map<TestCaseDto>(_service.Get(id));
         }
@@ -32,20 +32,20 @@ namespace OneTestApi.Controllers
         }
 
         [HttpPost("{id}")]
-        public TestCaseDto UpdateTestCase(int id, [FromBody] UpdateTestCaseParams ps)
+        public TestCaseDto UpdateTestCase([FromRoute] int id, [FromBody] UpdateTestCaseParams ps)
         {
             ps.Id = id;
             return _mapper.Map<TestCaseDto>(_service.Update(ps));
         }
-        
+
         [HttpPost("{id}")]
-        public void MoveTestCase(int id, [FromQuery] int toParentId, [FromQuery] int toPosition)
+        public void MoveTestCase([FromRoute] int id, [FromBody] int toParentId, [FromBody] int toPosition)
         {
             _service.Move(id, toParentId, toPosition);
         }
 
         [HttpDelete("{id}")]
-        public void DeleteTestCase(int id)
+        public void DeleteTestCase([FromRoute] int id)
         {
             _service.Delete(id);
         }

@@ -19,7 +19,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\Dtos" />
     <Folder Include="wwwroot" />
   </ItemGroup>
   <ItemGroup>
