@@ -51,6 +51,13 @@ namespace OneTestApi.Services
                 .OrderBy(child => child.Position).ToList();
         }
         
+        /// <summary>
+        /// Move to parent and position.
+        /// 
+        /// ToParentId null means moving to root.
+        /// Negative ToPosition means appending to parent.
+        /// </summary>
+        /// <param name="ps"></param>
         public void Move(MoveTestNodeParams ps)
         {
             var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == ps.ToParentId);
