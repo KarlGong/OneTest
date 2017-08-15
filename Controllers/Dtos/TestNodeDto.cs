@@ -12,6 +12,8 @@ namespace OneTestApi.Controllers.DTOs
         
         public string Type { get; set; }
         
+        public int? ParentId { get; set; }
+        
         public List<TestNodeDto> Children { get; set; } = new List<TestNodeDto>();
     }
 }

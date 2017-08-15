@@ -35,8 +35,6 @@ namespace OneTestApi.Services
 
         TestProject Update(UpdateTestProjectParams ps);
 
-        void Move(int id, int toPosition);
-
         void Delete(int id);
     }
 
@@ -90,35 +88,6 @@ namespace OneTestApi.Services
             _context.SaveChanges();
 
             return previousTestProject;
-        }
-
-        public void Move(int id, int toPosition)
-        {
-            var projectCount = _context.TestProjects.Count();
-            toPosition = toPosition <= -1 ? projectCount : Math.Min(toPosition, projectCount);
-
-            var previousTestProject = Get(id);
-
-            if (previousTestProject.Position > toPosition)
-            {
-                foreach (var project in _context.TestProjects.Where(tp =>
-                    tp.Position >= toPosition && tp.Position < previousTestProject.Position))
-                {
-                    project.Position++;
-                }
-            }
-            else if (previousTestProject.Position < toPosition)
-            {
-                foreach (var project in _context.TestProjects.Where(tp =>
-                    tp.Position <= toPosition && tp.Position > previousTestProject.Position))
-                {
-                    project.Position--;
-                }
-            }
-
-            previousTestProject.Position = toPosition;
-
-            _context.SaveChanges();
         }
 
         public void Delete(int id)

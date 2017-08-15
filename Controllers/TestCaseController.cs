@@ -8,7 +8,7 @@ using OneTestApi.Services;
 namespace OneTestApi.Controllers
 {
     [Route("api/case")]
-    public class TestCaseController
+    public class TestCaseController: Controller
     {
         private readonly ITestCaseService _service;
         private readonly IMapper _mapper;
@@ -36,12 +36,6 @@ namespace OneTestApi.Controllers
         {
             ps.Id = id;
             return _mapper.Map<TestCaseDto>(_service.Update(ps));
-        }
-
-        [HttpPost("{id}/move")]
-        public void MoveTestCase([FromRoute] int id, [FromBody] int toParentId, [FromBody] int toPosition)
-        {
-            _service.Move(id, toParentId, toPosition);
         }
 
         [HttpDelete("{id}")]

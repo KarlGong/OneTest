@@ -9,7 +9,7 @@ using OneTestApi.Services;
 namespace OneTestApi.Controllers
 {
     [Route("api/node")]
-    public class TestNodeController
+    public class TestNodeController: Controller
     {
         private readonly ITestNodeService _service;
         private readonly IMapper _mapper;
@@ -30,6 +30,13 @@ namespace OneTestApi.Controllers
         public List<TestNodeDto> GetChildren([FromRoute] int id)
         {
             return _service.GetChildren(id).Select(tn => _mapper.Map<TestNodeDto>(tn)).ToList();
+        }
+        
+        [HttpPost("{id}/move")]
+        public void MoveTestNode([FromRoute] int id, [FromBody] MoveTestNodeParams ps)
+        {
+            ps.Id = id;
+            _service.Move(ps);
         }
     }
 }

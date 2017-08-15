@@ -12,7 +12,7 @@ using OneTestApi.Services;
 namespace OneTestApi.Controllers
 {
     [Route("api/project")]
-    public class TestProjectController
+    public class TestProjectController: Controller
     {
         private readonly ITestProjectService _service;
         private readonly IMapper _mapper;
@@ -46,12 +46,6 @@ namespace OneTestApi.Controllers
         {
             ps.Id = id;
             return _mapper.Map<TestProjectDto>(_service.Update(ps));
-        }
-
-        [HttpPost("{id}/move")]
-        public void MoveTestProject([FromRoute] int id, [FromBody] int toPosition)
-        {
-            _service.Move(id, toPosition);
         }
 
         [HttpDelete("{id}")]

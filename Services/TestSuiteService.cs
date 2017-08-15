@@ -35,8 +35,6 @@ namespace OneTestApi.Services
 
         TestSuite Update(UpdateTestSuiteParams ps);
 
-        void Move(int id, int toParentId, int toPosition);
-        
         void Delete(int id);
     }
 
@@ -86,55 +84,6 @@ namespace OneTestApi.Services
             _context.SaveChanges();
 
             return previousTestSuite;
-        }
-
-        public void Move(int id, int toParentId, int toPosition)
-        {
-            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == toParentId);
-            toPosition = toPosition <= -1 ? sibingsCount : Math.Min(toPosition, sibingsCount);
-
-            var previousTestSuite = Get(id);
-
-            if (previousTestSuite.ParentId == toParentId)
-            {
-                if (previousTestSuite.Position > toPosition)
-                {
-                    foreach (var node in _context.TestNodes.Where(tn =>
-                        tn.ParentId == toParentId && tn.Position >= toPosition &&
-                        tn.Position < previousTestSuite.Position))
-                    {
-                        node.Position++;
-                    }
-                }
-                else if (previousTestSuite.Position < toPosition)
-                {
-                    foreach (var node in _context.TestNodes.Where(tn =>
-                        tn.ParentId == toParentId && tn.Position <= toPosition &&
-                        tn.Position > previousTestSuite.Position))
-                    {
-                        node.Position--;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var node in _context.TestNodes.Where(tn =>
-                    tn.ParentId == previousTestSuite.ParentId && tn.Position > previousTestSuite.Position))
-                {
-                    node.Position--;
-                }
-
-                foreach (var node in _context.TestNodes.Where(tn =>
-                    tn.ParentId == toParentId && tn.Position >= toPosition))
-                {
-                    node.Position++;
-                }
-            }
-
-            previousTestSuite.ParentId = toParentId;
-            previousTestSuite.Position = toPosition;
-
-            _context.SaveChanges();
         }
 
         public void Delete(int id)

@@ -13,65 +13,65 @@ namespace OneTestApi.Services
         public int ParentId { get; set; }
 
         public int Position { get; set; }
-        
+
         public string Name { get; set; }
 
         public string Summary { get; set; }
-        
+
         public string Precondition { get; set; }
 
         public TestCaseExecutionType ExecutionType { get; set; }
-        
+
         public TestCaseImportance Importance { get; set; }
-        
-        public List<AddTestCaseTagParams> Tags { get; set; } = new List<AddTestCaseTagParams>();
 
-        public List<AddTestStepParams> TestSteps { get; set; } = new List<AddTestStepParams>();
+        public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
+
+        public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
+
+        public class TestCaseTag
+        {
+            public string Value { get; set; }
+        }
+
+        public class TestStep
+        {
+            public string Action { get; set; }
+
+            public string ExpectedResult { get; set; }
+        }
     }
 
-    public class AddTestCaseTagParams
-    {
-        public string Value { get; set; }
-    }
-
-    public class AddTestStepParams
-    {
-        public string Action { get; set; }
-        
-        public string ExpectedResult { get; set; }
-    }
-    
     public class UpdateTestCaseParams
     {
         public int Id { get; set; }
-        
+
         public string Name { get; set; }
 
         public string Summary { get; set; }
-        
+
         public string Precondition { get; set; }
 
         public TestCaseExecutionType ExecutionType { get; set; }
-        
+
         public TestCaseImportance Importance { get; set; }
-        
-        public List<UpdateTestCaseTagParams> Tags { get; set; } = new List<UpdateTestCaseTagParams>();
 
-        public List<UpdateTestStepParams> TestSteps { get; set; } = new List<UpdateTestStepParams>();
+        public List<TestCaseTag> Tags { get; set; } = new List<TestCaseTag>();
+
+        public List<TestStep> TestSteps { get; set; } = new List<TestStep>();
+
+        public class TestCaseTag
+        {
+            public string Value { get; set; }
+        }
+
+        public class TestStep
+        {
+            public string Action { get; set; }
+
+            public string ExpectedResult { get; set; }
+        }
     }
 
-    public class UpdateTestCaseTagParams
-    {
-        public string Value { get; set; }
-    }
-
-    public class UpdateTestStepParams
-    {
-        public string Action { get; set; }
-        
-        public string ExpectedResult { get; set; }
-    }
-    
     public interface ITestCaseService
     {
         TestCase Get(int id);
@@ -79,8 +79,6 @@ namespace OneTestApi.Services
         TestCase Add(AddTestCaseParams ps);
 
         TestCase Update(UpdateTestCaseParams ps);
-
-        void Move(int id, int toParentId, int toPosition);
 
         void Delete(int id);
     }
@@ -139,55 +137,6 @@ namespace OneTestApi.Services
             _context.SaveChanges();
 
             return previousTestCase;
-        }
-
-        public void Move(int id, int toParentId, int toPosition)
-        {
-            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == toParentId);
-            toPosition = toPosition <= -1 ? sibingsCount : Math.Min(toPosition, sibingsCount);
-            
-            var previousTestCase = Get(id);
-
-            if (previousTestCase.ParentId == toParentId)
-            {
-                if (previousTestCase.Position > toPosition)
-                {
-                    foreach (var node in _context.TestNodes.Where(tn =>
-                        tn.ParentId == toParentId && tn.Position >= toPosition &&
-                        tn.Position < previousTestCase.Position))
-                    {
-                        node.Position++;
-                    }
-                }
-                else if (previousTestCase.Position < toPosition)
-                {
-                    foreach (var node in _context.TestNodes.Where(tn =>
-                        tn.ParentId == toParentId && tn.Position <= toPosition &&
-                        tn.Position > previousTestCase.Position))
-                    {
-                        node.Position--;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var node in _context.TestNodes.Where(tn =>
-                    tn.ParentId == previousTestCase.ParentId && tn.Position > previousTestCase.Position))
-                {
-                    node.Position--;
-                }
-
-                foreach (var node in _context.TestNodes.Where(tn =>
-                    tn.ParentId == toParentId && tn.Position >= toPosition))
-                {
-                    node.Position++;
-                }
-            }
-
-            previousTestCase.ParentId = toParentId;
-            previousTestCase.Position = toPosition;
-            
-            _context.SaveChanges();
         }
 
         public void Delete(int id)

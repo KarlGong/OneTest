@@ -6,7 +6,7 @@ using OneTestApi.Services;
 namespace OneTestApi.Controllers
 {
     [Route("api/tag")]
-    public class TestCaseTagController
+    public class TestCaseTagController: Controller
     {
         private readonly ITestCaseTagService _service;
 
