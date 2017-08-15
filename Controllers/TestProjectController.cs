@@ -35,24 +35,6 @@ namespace OneTestApi.Controllers
             return _mapper.Map<TestProjectDto>(_service.Get(id));
         }
 
-        [HttpGet("{id}/children")]
-        public List<object> GetChildren([FromRoute] int id)
-        {
-            var children = new List<object>();
-            foreach (var testNode in _service.GetChildren(id))
-            {
-                if (testNode is TestCase)
-                {
-                    children.Add(_mapper.Map<TestCaseDto>(testNode));
-                }
-                else if (testNode is TestSuite)
-                {
-                    children.Add(_mapper.Map<TestSuiteDto>(testNode));
-                }
-            }
-            return children;
-        }
-
         [HttpPut]
         public TestProjectDto AddTestProject([FromBody] AddTestProjectParams ps)
         {

@@ -1,17 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OneTestApi.Controllers.DTOs
 {
-    public class TestProjectDto
+    public class TestProjectDto: TestNodeDto
     {
-        public int Id { get; set; }
-        
-        public int Position { get; set; }
-        
-        public string Name { get; set; }
-        
-        public string Type = "project";
-        
         public string Description { get; set; }
         
         public DateTime InsertTime { get; set; }

@@ -4,16 +4,8 @@ using OneTestApi.Models;
 
 namespace OneTestApi.Controllers.DTOs
 {
-    public class TestCaseDto
+    public class TestCaseDto: TestNodeDto
     {
-        public int Id { get; set; }
-        
-        public int Position { get; set; }
-
-        public string Name { get; set; }
-
-        public string Type = "case";
-        
         public string Summary { get; set; }
         
         public string Precondition { get; set; }

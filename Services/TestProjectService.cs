@@ -31,8 +31,6 @@ namespace OneTestApi.Services
         
         TestProject Get(int id);
         
-        List<TestNode> GetChildren(int id);
-
         TestProject Add(AddTestProjectParams ps);
 
         TestProject Update(UpdateTestProjectParams ps);
@@ -62,11 +60,6 @@ namespace OneTestApi.Services
         public TestProject Get(int id)
         {
             return _context.TestProjects.Single(tp => tp.Id == id);
-        }
-
-        public List<TestNode> GetChildren(int id)
-        {
-            return _context.TestProjects.Include(tp => tp.Children).Single(tp => tp.Id == id).Children;
         }
 
         public TestProject Add(AddTestProjectParams ps)

@@ -38,7 +38,7 @@ namespace OneTestApi.Controllers
             return _mapper.Map<TestCaseDto>(_service.Update(ps));
         }
 
-        [HttpPost("{id}")]
+        [HttpPost("{id}/move")]
         public void MoveTestCase([FromRoute] int id, [FromBody] int toParentId, [FromBody] int toPosition)
         {
             _service.Move(id, toParentId, toPosition);

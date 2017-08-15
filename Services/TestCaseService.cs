@@ -20,9 +20,9 @@ namespace OneTestApi.Services
         
         public string Precondition { get; set; }
 
-        public string ExecutionType { get; set; }
+        public TestCaseExecutionType ExecutionType { get; set; }
         
-        public string Importance { get; set; }
+        public TestCaseImportance Importance { get; set; }
         
         public List<AddTestCaseTagParams> Tags { get; set; } = new List<AddTestCaseTagParams>();
 
@@ -51,9 +51,9 @@ namespace OneTestApi.Services
         
         public string Precondition { get; set; }
 
-        public string ExecutionType { get; set; }
+        public TestCaseExecutionType ExecutionType { get; set; }
         
-        public string Importance { get; set; }
+        public TestCaseImportance Importance { get; set; }
         
         public List<UpdateTestCaseTagParams> Tags { get; set; } = new List<UpdateTestCaseTagParams>();
 
@@ -75,8 +75,6 @@ namespace OneTestApi.Services
     public interface ITestCaseService
     {
         TestCase Get(int id);
-
-        TestNode GetParent(int id);
 
         TestCase Add(AddTestCaseParams ps);
 
@@ -106,11 +104,6 @@ namespace OneTestApi.Services
             testCase.TestSteps = testCase.TestSteps.OrderBy(ts => ts.Id).ToList();
 
             return testCase;
-        }
-
-        public TestNode GetParent(int id)
-        {
-            return _context.TestCases.Include(tn => tn.Parent).Single(tn => tn.Id == id).Parent;
         }
 
         public TestCase Add(AddTestCaseParams ps)

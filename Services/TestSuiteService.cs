@@ -31,10 +31,6 @@ namespace OneTestApi.Services
     {
         TestSuite Get(int id);
 
-        TestNode GetParent(int id);
-
-        List<TestNode> GetChildren(int id);
-
         TestSuite Add(AddTestSuiteParams ps);
 
         TestSuite Update(UpdateTestSuiteParams ps);
@@ -59,16 +55,6 @@ namespace OneTestApi.Services
         public TestSuite Get(int id)
         {
             return _context.TestSuites.Single(ts => ts.Id == id);
-        }
-
-        public TestNode GetParent(int id)
-        {
-            return _context.TestSuites.Include(tn => tn.Parent).Single(tn => tn.Id == id).Parent;
-        }
-
-        public List<TestNode> GetChildren(int id)
-        {
-            return _context.TestSuites.Include(ts => ts.Children).Single(ts => ts.Id == id).Children;
         }
 
         public TestSuite Add(AddTestSuiteParams ps)

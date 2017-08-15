@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using OneTestApi.Controllers.DTOs;
 using OneTestApi.Models;
 using OneTestApi.Services;
 
@@ -43,8 +45,9 @@ namespace OneTestApi
             services.AddDbContext<OneTestDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("mysql")));
 
-            services.AddAutoMapper();
+            services.AddAutoMapper(AutoMapperConfig);
 
+            services.AddTransient<ITestNodeService, TestNodeService>();
             services.AddTransient<ITestProjectService, TestProjectService>();
             services.AddTransient<ITestSuiteService, TestSuiteService>();
             services.AddTransient<ITestCaseService, TestCaseService>();
@@ -60,6 +63,17 @@ namespace OneTestApi
             app.UseDeveloperExceptionPage();
 
             app.UseMvc();
+        }
+
+        public void AutoMapperConfig(IMapperConfigurationExpression config)
+        {
+            config.AllowNullCollections = true;
+            config.AllowNullDestinationValues = true;
+            config.CreateMissingTypeMaps = true;
+            
+            config.CreateMap<TestCase, TestNodeDto>().ForMember(tnd => tnd.Type, opt => opt.ResolveUsing(tn => "case"));
+            config.CreateMap<TestSuite, TestNodeDto>().ForMember(tnd => tnd.Type, opt => opt.ResolveUsing(tn => "suite"));
+            config.CreateMap<TestProject, TestNodeDto>().ForMember(tnd => tnd.Type, opt => opt.ResolveUsing(tn => "project"));
         }
     }
 }

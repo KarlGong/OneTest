@@ -26,24 +26,6 @@ namespace OneTestApi.Controllers
             return _mapper.Map<TestSuiteDto>(_service.Get(id));
         }
 
-        [HttpGet("{id}/children")]
-        public List<object> GetChildren([FromRoute] int id)
-        {
-            var children = new List<object>();
-            foreach (var testNode in _service.GetChildren(id))
-            {
-                if (testNode is TestCase)
-                {
-                    children.Add(_mapper.Map<TestCaseDto>(testNode));
-                }
-                else if (testNode is TestSuite)
-                {
-                    children.Add(_mapper.Map<TestSuiteDto>(testNode));
-                }
-            }
-            return children;
-        }
-
         [HttpPut]
         public TestSuiteDto AddTestSuite([FromBody] AddTestSuiteParams ps)
         {
@@ -57,7 +39,7 @@ namespace OneTestApi.Controllers
             return _mapper.Map<TestSuiteDto>(_service.Update(ps));
         }
 
-        [HttpPost("{id}")]
+        [HttpPost("{id}/move")]
         public void MoveTestSuite([FromRoute] int id, [FromBody] int toParentId, [FromBody] int toPosition)
         {
             _service.Move(id, toParentId, toPosition);
