@@ -23,7 +23,7 @@ namespace OneTestApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public IEnumerable<TestProjectDto> GetTestProjects()
         {
             return _mapper.Map<List<TestProjectDto>>(_service.GetAll());

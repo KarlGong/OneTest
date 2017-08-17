@@ -47,8 +47,7 @@ namespace OneTestApi.Services
 
         public List<TestNode> GetChildren(int id)
         {
-            return _context.TestNodes.Include(ts => ts.Children).Single(ts => ts.Id == id).Children
-                .OrderBy(child => child.Position).ToList();
+            return _context.TestNodes.Where(tn => tn.ParentId == id).OrderBy(tn => tn.Position).ToList();
         }
         
         /// <summary>
