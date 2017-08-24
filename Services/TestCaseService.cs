@@ -128,9 +128,7 @@ namespace OneTestApi.Services
         {
             var previousTestCase = Get(ps.Id);
 
-            _context.TestSteps.RemoveRange(previousTestCase.TestSteps);
-            
-            _context.TestCaseTags.RemoveRange(previousTestCase.Tags);
+            _context.TestCases.Attach(previousTestCase);
 
             _mapper.Map(ps, previousTestCase);
 
