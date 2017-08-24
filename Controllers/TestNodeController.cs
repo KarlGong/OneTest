@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using OneTestApi.Controllers.DTOs;
@@ -21,22 +22,22 @@ namespace OneTestApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public TestNodeDto GetTestNode([FromRoute] int id)
+        public async Task<TestNodeDto> GetTestNode([FromRoute] int id)
         {
-            return _mapper.Map<TestNodeDto>(_service.Get(id));
+            return _mapper.Map<TestNodeDto>(await _service.GetAsync(id));
         }
 
         [HttpGet("{id}/children")]
-        public List<TestNodeDto> GetChildren([FromRoute] int id)
+        public async Task<List<TestNodeDto>> GetChildren([FromRoute] int id)
         {
-            return _service.GetChildren(id).Select(tn => _mapper.Map<TestNodeDto>(tn)).ToList();
+            return (await _service.GetChildrenAsync(id)).Select(tn => _mapper.Map<TestNodeDto>(tn)).ToList();
         }
         
         [HttpPost("{id}/move")]
-        public void MoveTestNode([FromRoute] int id, [FromBody] MoveTestNodeParams ps)
+        public async Task MoveTestNode([FromRoute] int id, [FromBody] MoveTestNodeParams ps)
         {
             ps.Id = id;
-            _service.Move(ps);
+            await _service.MoveAsync(ps);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OneTestApi.Models;
@@ -29,13 +30,13 @@ namespace OneTestApi.Services
     
     public interface ITestSuiteService
     {
-        TestSuite Get(int id);
+        Task<TestSuite> GetAsync(int id);
 
-        TestSuite Add(AddTestSuiteParams ps);
+        Task<TestSuite> AddAsync(AddTestSuiteParams ps);
 
-        TestSuite Update(UpdateTestSuiteParams ps);
+        Task<TestSuite> UpdateAsync(UpdateTestSuiteParams ps);
 
-        void Delete(int id);
+        Task DeleteAsync(int id);
     }
 
     public class TestSuiteService : ITestSuiteService
@@ -50,14 +51,14 @@ namespace OneTestApi.Services
             _mapper = mapper;
         }
 
-        public TestSuite Get(int id)
+        public async Task<TestSuite> GetAsync(int id)
         {
-            return _context.TestSuites.Single(ts => ts.Id == id);
+            return await _context.TestSuites.SingleAsync(ts => ts.Id == id);
         }
 
-        public TestSuite Add(AddTestSuiteParams ps)
+        public async Task<TestSuite> AddAsync(AddTestSuiteParams ps)
         {
-            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == ps.ParentId);
+            var sibingsCount = await _context.TestNodes.CountAsync(tn => tn.ParentId == ps.ParentId);
             ps.Position = ps.Position == -1 ? sibingsCount : Math.Min(ps.Position, sibingsCount);
 
             foreach (var node in _context.TestNodes.Where(tn =>
@@ -68,27 +69,27 @@ namespace OneTestApi.Services
 
             var testSuite = _mapper.Map<TestSuite>(ps);
             
-            _context.TestSuites.Add(testSuite);
+            await _context.TestSuites.AddAsync(testSuite);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return testSuite;
         }
 
-        public TestSuite Update(UpdateTestSuiteParams ps)
+        public async Task<TestSuite> UpdateAsync(UpdateTestSuiteParams ps)
         {
-            var previousTestSuite = Get(ps.Id);
+            var previousTestSuite = await GetAsync(ps.Id);
 
             _mapper.Map(ps, previousTestSuite);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return previousTestSuite;
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var testSuite = Get(id);
+            var testSuite = await GetAsync(id);
 
             foreach (var node in _context.TestNodes.Where(tn =>
                 tn.ParentId == testSuite.ParentId && tn.Position > testSuite.Position))
@@ -98,7 +99,7 @@ namespace OneTestApi.Services
 
             _context.TestSuites.Remove(testSuite);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

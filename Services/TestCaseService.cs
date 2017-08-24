@@ -74,13 +74,13 @@ namespace OneTestApi.Services
 
     public interface ITestCaseService
     {
-        TestCase Get(int id);
+        Task<TestCase> GetAsync(int id);
 
-        TestCase Add(AddTestCaseParams ps);
+        Task<TestCase> AddAsync(AddTestCaseParams ps);
 
-        TestCase Update(UpdateTestCaseParams ps);
+        Task<TestCase> UpdateAsync(UpdateTestCaseParams ps);
 
-        void Delete(int id);
+        Task DeleteAsync(int id);
     }
 
     public class TestCaseService : ITestCaseService
@@ -95,18 +95,18 @@ namespace OneTestApi.Services
             _mapper = mapper;
         }
 
-        public TestCase Get(int id)
+        public async Task<TestCase> GetAsync(int id)
         {
-            var testCase = _context.TestCases.Include(tc => tc.TestSteps).Include(tc => tc.Tags)
-                .Single(tc => tc.Id == id);
+            var testCase = await _context.TestCases.Include(tc => tc.TestSteps).Include(tc => tc.Tags)
+                .SingleAsync(tc => tc.Id == id);
             testCase.TestSteps = testCase.TestSteps.OrderBy(ts => ts.Id).ToList();
 
             return testCase;
         }
 
-        public TestCase Add(AddTestCaseParams ps)
+        public async Task<TestCase> AddAsync(AddTestCaseParams ps)
         {
-            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == ps.ParentId);
+            var sibingsCount = await _context.TestNodes.CountAsync(tn => tn.ParentId == ps.ParentId);
             ps.Position = ps.Position == -1 ? sibingsCount : Math.Min(ps.Position, sibingsCount);
 
             foreach (var node in _context.TestNodes.Where(tn =>
@@ -117,29 +117,29 @@ namespace OneTestApi.Services
 
             var testCase = _mapper.Map<TestCase>(ps);
             
-            _context.TestCases.Add(testCase);
+            await _context.TestCases.AddAsync(testCase);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return testCase;
         }
 
-        public TestCase Update(UpdateTestCaseParams ps)
+        public async Task<TestCase> UpdateAsync(UpdateTestCaseParams ps)
         {
-            var previousTestCase = Get(ps.Id);
+            var previousTestCase = await GetAsync(ps.Id);
 
             _context.TestCases.Attach(previousTestCase);
 
             _mapper.Map(ps, previousTestCase);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return previousTestCase;
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var testCase = Get(id);
+            var testCase = await GetAsync(id);
 
             foreach (var node in _context.TestNodes.Where(tn =>
                 tn.ParentId == testCase.ParentId && tn.Position > testCase.Position))
@@ -149,7 +149,7 @@ namespace OneTestApi.Services
 
             _context.TestCases.Remove(testCase);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

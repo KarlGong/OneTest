@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OneTestApi.Models;
 using OneTestApi.Services;
@@ -16,9 +17,9 @@ namespace OneTestApi.Controllers
         }
 
         [HttpGet]
-        public List<string> SearchTags([FromQuery] string searchText, [FromQuery] int limit)
+        public async Task<List<string>> SearchTags([FromQuery] string searchText, [FromQuery] int limit)
         {
-            return _service.SearchTags(searchText, limit);
+            return await _service.SearchTagsAsync(searchText, limit);
         }
     }
 }

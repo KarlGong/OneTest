@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using OneTestApi.Controllers.DTOs;
@@ -20,28 +21,28 @@ namespace OneTestApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public TestCaseDto GetTestCase([FromRoute] int id)
+        public async Task<TestCaseDto> GetTestCase([FromRoute] int id)
         {
-            return _mapper.Map<TestCaseDto>(_service.Get(id));
+            return _mapper.Map<TestCaseDto>(await _service.GetAsync(id));
         }
 
         [HttpPut]
-        public TestCaseDto AddTestCase([FromBody] AddTestCaseParams ps)
+        public async Task<TestCaseDto> AddTestCase([FromBody] AddTestCaseParams ps)
         {
-            return _mapper.Map<TestCaseDto>(_service.Add(ps));
+            return _mapper.Map<TestCaseDto>(await _service.AddAsync(ps));
         }
 
         [HttpPost("{id}")]
-        public TestCaseDto UpdateTestCase([FromRoute] int id, [FromBody] UpdateTestCaseParams ps)
+        public async Task<TestCaseDto> UpdateTestCase([FromRoute] int id, [FromBody] UpdateTestCaseParams ps)
         {
             ps.Id = id;
-            return _mapper.Map<TestCaseDto>(_service.Update(ps));
+            return _mapper.Map<TestCaseDto>(await _service.UpdateAsync(ps));
         }
 
         [HttpDelete("{id}")]
-        public void DeleteTestCase([FromRoute] int id)
+        public async Task DeleteTestCase([FromRoute] int id)
         {
-            _service.Delete(id);
+            await _service.DeleteAsync(id);
         }
     }
 }

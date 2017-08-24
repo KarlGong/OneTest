@@ -24,34 +24,34 @@ namespace OneTestApi.Controllers
         }
 
         [HttpGet("all")]
-        public IEnumerable<TestProjectDto> GetTestProjects()
+        public async Task<List<TestProjectDto>> GetTestProjects()
         {
-            return _mapper.Map<List<TestProjectDto>>(_service.GetAll());
+            return _mapper.Map<List<TestProjectDto>>(await _service.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public TestProjectDto GetTestProject([FromRoute] int id)
+        public async Task<TestProjectDto> GetTestProject([FromRoute] int id)
         {
-            return _mapper.Map<TestProjectDto>(_service.Get(id));
+            return _mapper.Map<TestProjectDto>(await _service.GetAsync(id));
         }
 
         [HttpPut]
-        public TestProjectDto AddTestProject([FromBody] AddTestProjectParams ps)
+        public async Task<TestProjectDto> AddTestProject([FromBody] AddTestProjectParams ps)
         {
-            return _mapper.Map<TestProjectDto>(_service.Add(ps));
+            return _mapper.Map<TestProjectDto>(await _service.AddAsync(ps));
         }
 
         [HttpPost("{id}")]
-        public TestProjectDto UpdateTestProject([FromRoute] int id, [FromBody] UpdateTestProjectParams ps)
+        public async Task<TestProjectDto> UpdateTestProject([FromRoute] int id, [FromBody] UpdateTestProjectParams ps)
         {
             ps.Id = id;
-            return _mapper.Map<TestProjectDto>(_service.Update(ps));
+            return _mapper.Map<TestProjectDto>(await _service.UpdateAsync(ps));
         }
 
         [HttpDelete("{id}")]
-        public void DeleteTestProject([FromRoute] int id)
+        public async Task DeleteTestProject([FromRoute] int id)
         {
-            _service.Delete(id);
+            await _service.DeleteAsync(id);
         }
     }
 }

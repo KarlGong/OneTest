@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OneTestApi.Models;
@@ -27,15 +28,15 @@ namespace OneTestApi.Services
     
     public interface ITestProjectService
     {
-        List<TestProject> GetAll();
+        Task<List<TestProject>> GetAllAsync();
         
-        TestProject Get(int id);
+        Task<TestProject> GetAsync(int id);
         
-        TestProject Add(AddTestProjectParams ps);
+        Task<TestProject> AddAsync(AddTestProjectParams ps);
 
-        TestProject Update(UpdateTestProjectParams ps);
+        Task<TestProject> UpdateAsync(UpdateTestProjectParams ps);
 
-        void Delete(int id);
+        Task DeleteAsync(int id);
     }
 
     public class TestProjectService : ITestProjectService
@@ -50,19 +51,19 @@ namespace OneTestApi.Services
             _mapper = mapper;
         }
 
-        public List<TestProject> GetAll()
+        public async Task<List<TestProject>> GetAllAsync()
         {
-            return _context.TestProjects.OrderBy(tp => tp.Position).ToList();
+            return await _context.TestProjects.OrderBy(tp => tp.Position).ToListAsync();
         }
 
-        public TestProject Get(int id)
+        public async Task<TestProject> GetAsync(int id)
         {
-            return _context.TestProjects.Single(tp => tp.Id == id);
+            return await _context.TestProjects.SingleAsync(tp => tp.Id == id);
         }
 
-        public TestProject Add(AddTestProjectParams ps)
+        public async Task<TestProject> AddAsync(AddTestProjectParams ps)
         {
-            var projectCount = _context.TestProjects.Count();
+            var projectCount = await _context.TestProjects.CountAsync();
             ps.Position = ps.Position == -1 ? projectCount : Math.Min(ps.Position, projectCount);
 
             foreach (var project in _context.TestProjects.Where(tp => tp.Position >= ps.Position))
@@ -72,27 +73,27 @@ namespace OneTestApi.Services
 
             var testProject = _mapper.Map<TestProject>(ps);
             
-            _context.TestProjects.Add(testProject);
+            await _context.TestProjects.AddAsync(testProject);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return testProject;
         }
 
-        public TestProject Update(UpdateTestProjectParams ps)
+        public async Task<TestProject> UpdateAsync(UpdateTestProjectParams ps)
         {
-            var previousTestProject = Get(ps.Id);
+            var previousTestProject = await GetAsync(ps.Id);
 
             _mapper.Map(ps, previousTestProject);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return previousTestProject;
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var testProject = Get(id);
+            var testProject = await GetAsync(id);
 
             foreach (var project in _context.TestProjects.Where(tp => tp.Position > testProject.Position))
             {
@@ -101,7 +102,7 @@ namespace OneTestApi.Services
 
             _context.TestProjects.Remove(testProject);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

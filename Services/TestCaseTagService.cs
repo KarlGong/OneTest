@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using OneTestApi.Models;
 
 namespace OneTestApi.Services
 {
     public interface ITestCaseTagService
     {
-        List<string> SearchTags(string searchText, int limit);
+        Task<List<string>> SearchTagsAsync(string searchText, int limit);
     }
-    
-    public class TestCaseTagService: ITestCaseTagService
+
+    public class TestCaseTagService : ITestCaseTagService
     {
         private OneTestDbContext _context;
 
@@ -18,9 +20,10 @@ namespace OneTestApi.Services
             _context = context;
         }
 
-        public List<string> SearchTags(string searchText = "", int limit = 10)
+        public async Task<List<string>> SearchTagsAsync(string searchText = "", int limit = 10)
         {
-            return _context.TestCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText ?? "")).Distinct().Take(limit).ToList();
+            return await _context.TestCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText ?? "")).Distinct()
+                .Take(limit).ToListAsync();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OneTestApi.Models;
 
@@ -17,13 +18,13 @@ namespace OneTestApi.Services
     
     public interface ITestNodeService
     {
-        TestNode Get(int id);
+        Task<TestNode> GetAsync(int id);
 
-        TestNode GetParent(int id);
+        Task<TestNode> GetParentAsync(int id);
 
-        List<TestNode> GetChildren(int id);
+        Task<List<TestNode>> GetChildrenAsync(int id);
 
-        void Move(MoveTestNodeParams ps);
+        Task MoveAsync(MoveTestNodeParams ps);
     }
 
     public class TestNodeService : ITestNodeService
@@ -35,19 +36,19 @@ namespace OneTestApi.Services
             _context = context;
         }
 
-        public TestNode Get(int id)
+        public async Task<TestNode> GetAsync(int id)
         {
-            return _context.TestNodes.Single(tn => tn.Id == id);
+            return await _context.TestNodes.SingleAsync(tn => tn.Id == id);
         }
 
-        public TestNode GetParent(int id)
+        public async Task<TestNode> GetParentAsync(int id)
         {
-            return _context.TestNodes.Include(tn => tn.Parent).Single(tn => tn.Id == id).Parent;
+            return (await _context.TestNodes.Include(tn => tn.Parent).SingleAsync(tn => tn.Id == id)).Parent;
         }
 
-        public List<TestNode> GetChildren(int id)
+        public async Task<List<TestNode>> GetChildrenAsync(int id)
         {
-            return _context.TestNodes.Where(tn => tn.ParentId == id).OrderBy(tn => tn.Position).ToList();
+            return await _context.TestNodes.Where(tn => tn.ParentId == id).OrderBy(tn => tn.Position).ToListAsync();
         }
         
         /// <summary>
@@ -57,12 +58,12 @@ namespace OneTestApi.Services
         /// Negative ToPosition means appending to parent.
         /// </summary>
         /// <param name="ps"></param>
-        public void Move(MoveTestNodeParams ps)
+        public async Task MoveAsync(MoveTestNodeParams ps)
         {
-            var sibingsCount = _context.TestNodes.Count(tn => tn.ParentId == ps.ToParentId);
+            var sibingsCount = await _context.TestNodes.CountAsync(tn => tn.ParentId == ps.ToParentId);
             ps.ToPosition = ps.ToPosition <= -1 ? sibingsCount : Math.Min(ps.ToPosition, sibingsCount);
             
-            var previousTestNode = Get(ps.Id);
+            var previousTestNode = await GetAsync(ps.Id);
 
             if (previousTestNode.ParentId == ps.ToParentId)
             {
@@ -107,7 +108,7 @@ namespace OneTestApi.Services
             }
             
             previousTestNode.ParentId = ps.ToParentId;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
