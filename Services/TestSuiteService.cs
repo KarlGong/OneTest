@@ -43,11 +43,14 @@ namespace OneTestApi.Services
     {
         private readonly OneTestDbContext _context;
 
+        private readonly ITestNodeService _nodeService;
+
         private readonly IMapper _mapper;
 
-        public TestSuiteService(OneTestDbContext context, IMapper mapper)
+        public TestSuiteService(OneTestDbContext context, ITestNodeService nodeService, IMapper mapper)
         {
             _context = context;
+            _nodeService = nodeService;
             _mapper = mapper;
         }
 
@@ -68,6 +71,7 @@ namespace OneTestApi.Services
             }
 
             var testSuite = _mapper.Map<TestSuite>(ps);
+            testSuite.Count = 0;
             
             await _context.TestSuites.AddAsync(testSuite);
 
@@ -98,7 +102,13 @@ namespace OneTestApi.Services
             }
 
             _context.TestSuites.Remove(testSuite);
-
+            
+            // calc count
+            foreach (var ancestor in await _nodeService.GetAncestorsAsync(id))
+            {
+                ancestor.Count -= testSuite.Count;
+            }
+            
             await _context.SaveChangesAsync();
         }
     }

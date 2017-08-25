@@ -20,11 +20,15 @@ namespace OneTestApi.Models
         public TestNode Parent { get; set; }
 
         public List<TestNode> Children { get; set; } = new List<TestNode>();
+
+        public int Count { get; set; }
         
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime InsertTime { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdateTime { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

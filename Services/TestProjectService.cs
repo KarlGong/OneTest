@@ -72,6 +72,7 @@ namespace OneTestApi.Services
             }
 
             var testProject = _mapper.Map<TestProject>(ps);
+            testProject.Count = 0;
             
             await _context.TestProjects.AddAsync(testProject);
 

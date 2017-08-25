@@ -23,5 +23,7 @@ namespace OneTestApi.Models
         
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdateTime { get; set; }
+        
+        public bool IsDeleted { get; set; }
     }
 }
