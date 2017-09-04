@@ -87,7 +87,7 @@ namespace OneTestApi.Services
         /// Move to parent and position.
         /// 
         /// ToParentId null means moving to root.
-        /// Negative ToPosition means appending to parent.
+        /// Negative ToPosition means appending to bottom of parent.
         /// </summary>
         /// <param name="ps"></param>
         public async Task MoveAsync(MoveTestNodeParams ps)

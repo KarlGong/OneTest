@@ -64,7 +64,7 @@ namespace OneTestApi.Services
         public async Task<TestProject> AddAsync(AddTestProjectParams ps)
         {
             var projectCount = await _context.TestProjects.CountAsync();
-            ps.Position = ps.Position == -1 ? projectCount : Math.Min(ps.Position, projectCount);
+            ps.Position = ps.Position <= -1 ? projectCount : Math.Min(ps.Position, projectCount);
 
             foreach (var project in _context.TestProjects.Where(tp => tp.Position >= ps.Position))
             {

@@ -62,7 +62,7 @@ namespace OneTestApi.Services
         public async Task<TestSuite> AddAsync(AddTestSuiteParams ps)
         {
             var sibingsCount = await _context.TestNodes.CountAsync(tn => tn.ParentId == ps.ParentId);
-            ps.Position = ps.Position == -1 ? sibingsCount : Math.Min(ps.Position, sibingsCount);
+            ps.Position = ps.Position <= -1 ? sibingsCount : Math.Min(ps.Position, sibingsCount);
 
             foreach (var node in _context.TestNodes.Where(tn =>
                 tn.ParentId == ps.ParentId && tn.Position >= ps.Position))
