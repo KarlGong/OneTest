@@ -42,12 +42,15 @@ namespace OneTestApi.Services
     public class TestProjectService : ITestProjectService
     {
         private readonly OneTestDbContext _context;
+        
+        private readonly ITestNodeService _nodeService;
 
         private readonly IMapper _mapper;
         
-        public TestProjectService(OneTestDbContext context, IMapper mapper)
+        public TestProjectService(OneTestDbContext context, ITestNodeService nodeService, IMapper mapper)
         {
             _context = context;
+            _nodeService = nodeService;
             _mapper = mapper;
         }
 
@@ -101,7 +104,8 @@ namespace OneTestApi.Services
                 project.Position--;
             }
 
-            _context.TestProjects.Remove(testProject);
+            testProject.IsDeleted = true;
+            (await _nodeService.GetDescendantsAsync(id)).ForEach(tn => tn.IsDeleted = true);
 
             await _context.SaveChangesAsync();
         }

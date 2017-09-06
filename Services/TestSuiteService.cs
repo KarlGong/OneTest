@@ -101,7 +101,8 @@ namespace OneTestApi.Services
                 node.Position--;
             }
 
-            _context.TestSuites.Remove(testSuite);
+            testSuite.IsDeleted = true;
+            (await _nodeService.GetDescendantsAsync(id)).ForEach(tn => tn.IsDeleted = true);
             
             // calc count
             foreach (var ancestor in await _nodeService.GetAncestorsAsync(id))

@@ -16,15 +16,13 @@ namespace OneTestApi.Models
         public DbSet<TestNode> TestNodes { get; set; }
         public DbSet<TestProject> TestProjects { get; set; }
         public DbSet<TestSuite> TestSuites { get; set; }
-        public DbSet<TestCase> TestCases { get; set; }
+        public DbSet<TestCase> TextCases { get; set; }
         public DbSet<TestStep> TestSteps { get; set; }
-        public DbSet<TestCaseTag> TestCaseTags { get; set; }
-
+        public DbSet<TestCaseTag> TextCaseTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TestNode>().HasOne(tn => tn.Parent).WithMany(tn => tn.Children)
-                .HasForeignKey(tn => tn.ParentId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<TestNode>().HasQueryFilter(tn => !tn.IsDeleted);
         }
     }
 }

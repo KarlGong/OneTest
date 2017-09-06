@@ -100,7 +100,7 @@ namespace OneTestApi.Services
 
         public async Task<TestCase> GetAsync(int id)
         {
-            var testCase = await _context.TestCases.Include(tc => tc.TestSteps).Include(tc => tc.Tags)
+            var testCase = await _context.TextCases.Include(tc => tc.TestSteps).Include(tc => tc.Tags)
                 .SingleAsync(tc => tc.Id == id);
             testCase.TestSteps = testCase.TestSteps.OrderBy(ts => ts.Id).ToList();
 
@@ -121,7 +121,7 @@ namespace OneTestApi.Services
             var testCase = _mapper.Map<TestCase>(ps);
             testCase.Count = 1;
             
-            await _context.TestCases.AddAsync(testCase);
+            await _context.TextCases.AddAsync(testCase);
 
             // calc count
             var ancestors = new List<TestNode>();
@@ -142,7 +142,7 @@ namespace OneTestApi.Services
         {
             var previousTestCase = await GetAsync(ps.Id);
 
-            _context.TestCases.Attach(previousTestCase);
+            _context.TextCases.Attach(previousTestCase);
 
             _mapper.Map(ps, previousTestCase);
 
@@ -161,7 +161,7 @@ namespace OneTestApi.Services
                 node.Position--;
             }
 
-            _context.TestCases.Remove(testCase);
+            testCase.IsDeleted = true;
             
             // calc count
             foreach (var ancestor in await _nodeService.GetAncestorsAsync(id))

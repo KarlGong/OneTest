@@ -22,7 +22,7 @@ namespace OneTestApi.Services
 
         public async Task<List<string>> SearchTagsAsync(string searchText = "", int limit = 10)
         {
-            return await _context.TestCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText ?? "")).Distinct()
+            return await _context.TextCaseTags.Select(t => t.Value).Where(v => v.Contains(searchText ?? "")).Distinct()
                 .Take(limit).ToListAsync();
         }
     }
