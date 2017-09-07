@@ -50,7 +50,7 @@ namespace OneTestApi
                 config.CreateMap<TestProject, TestNodeDto>().ForMember(tnd => tnd.Type, opt => opt.ResolveUsing(tn => "project"));
             });
             
-            services.AddDbContext<OneTestDbContext>(options =>
+            services.AddDbContextPool<OneTestDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("mysql")));
 
             services.AddTransient<ITestNodeService, TestNodeService>();
