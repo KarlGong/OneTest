@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OneTestApi.Models
 {
@@ -14,14 +12,10 @@ namespace OneTestApi.Models
         
         public int TestCaseId { get; set; }
         
-        [Required]
-        [ForeignKey("TestCaseId")]
         public TestCase TestCase { get; set; }
         
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime InsertTime { get; set; }
         
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdateTime { get; set; }
     }
 }

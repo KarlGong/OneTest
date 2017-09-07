@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata;
+using OneTestApi.Models;
 
-namespace OneTestApi.Models
+namespace OneTestApi.Data
 {
     public class OneTestDbContext : DbContext
     {
@@ -22,7 +23,12 @@ namespace OneTestApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TestNode>().HasQueryFilter(tn => !tn.IsDeleted);
+            modelBuilder.ApplyConfiguration(new TestNodeConfiguration());
+            modelBuilder.ApplyConfiguration(new TestProjectConfiguration());
+            modelBuilder.ApplyConfiguration(new TestSuiteConfiguration());
+            modelBuilder.ApplyConfiguration(new TestCaseConfiguration());
+            modelBuilder.ApplyConfiguration(new TestStepConfiguration());
+            modelBuilder.ApplyConfiguration(new TestCaseTagConfiguration());
         }
     }
 }

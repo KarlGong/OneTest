@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using OneTestApi.Data;
 using OneTestApi.Models;
 
 namespace OneTestApi.Services
